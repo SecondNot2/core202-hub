@@ -16,6 +16,7 @@
 - [x] Route injection từ plugins
 - [x] Shared state cho plugin communication
 - [x] Tạo plugin đầu tiên (Habit RPG v2)
+- [x] Triển khai Skill Tree, Boss, Archetype, Crafting systems
 - [ ] Integration với real auth provider
 - [ ] Command Palette full implementation
 
@@ -32,6 +33,10 @@
 - [x] Plugin template (`src/plugins/_template/`)
 - [x] Habit RPG v2 Core mechanics (XP, Level, Stats, Streak)
 - [x] Habit RPG v2 UI (Dashboard, HeroPanel, QuestList)
+- [x] Habit RPG v2 Skill Tree UI & Unlock logic
+- [x] Habit RPG v2 Boss Encounter & Damage logic
+- [x] Habit RPG v2 Archetype Selection (Week 3 unlock)
+- [x] Habit RPG v2 Crafting System & Recipes (Week 6 unlock)
 - [x] Documentation (README, ARCHITECTURE, RULES, HABIT-RPG-V2)
 - [x] VSCode settings cho better DX
 
@@ -39,15 +44,16 @@
 
 ## 🔄 Now
 
-- [ ] Triển khai Skill Tree UI cho Habit RPG
-- [ ] Triển khai Weekly Boss encounter page
-- [ ] Fix các cảnh báo TypeScript còn sót lại
+- [ ] Triển khai Monthly Raid Boss (Week 8)
+- [ ] Triển khai Relic & Inventory system details
+- [ ] Triển khai Hybrid Class selection (Week 7)
+- [ ] Fix polishing UI/UX (animations, sound effects placeholders)
 
 ---
 
 ## ⏭️ Next
 
-- [ ] Archetype selection system (Week 3)
+- [ ] Monthly Raid & Season Finale implementation
 - [ ] Integrate Supabase Auth (thay mock auth)
 - [ ] Enhance Command Palette (Ctrl+K) với nhiều action hơn
 - [ ] Implement Settings page functionality
@@ -104,4 +110,4 @@ npm run dev  # http://localhost:5173
 
 ---
 
-_Last updated: 2026-01-14 09:35_
+_Last updated: 2026-01-14 10:00_

@@ -21,6 +21,30 @@ export const manifest: PluginManifest = {
       path: "/rpg",
       icon: "gamepad",
     },
+    {
+      id: "rpg-character",
+      label: "Character",
+      path: "/rpg/character",
+      icon: "user",
+    },
+    {
+      id: "rpg-skills",
+      label: "Skill Tree",
+      path: "/rpg/skills",
+      icon: "zap",
+    },
+    {
+      id: "rpg-boss",
+      label: "Boss",
+      path: "/rpg/boss",
+      icon: "skull",
+    },
+    {
+      id: "rpg-craft",
+      label: "Crafting",
+      path: "/rpg/craft",
+      icon: "flask-conical",
+    },
   ],
 
   permissions: [],

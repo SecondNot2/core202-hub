@@ -81,6 +81,37 @@ export const GRACE_TOKEN_CRAFT_COST = 50;
 export const WEEKLY_BOSS_SHARDS = 10;
 export const RAID_BOSS_SHARDS = 25;
 
+// Crafting Recipes
+export const CRAFTING_RECIPES = [
+  {
+    id: "grace-token",
+    name: "Grace Token",
+    description: "Protect your streak when you miss a quest",
+    icon: "🎫",
+    goldCost: 50,
+    effect: "+1 Grace Token",
+    weekUnlock: 6,
+  },
+  {
+    id: "energy-potion",
+    name: "Energy Potion",
+    description: "Restore energy to complete more quests",
+    icon: "⚡",
+    goldCost: 30,
+    effect: "+25 Energy",
+    weekUnlock: 6,
+  },
+  {
+    id: "morale-boost",
+    name: "Morale Boost",
+    description: "Lift your spirits and increase rewards",
+    icon: "✨",
+    goldCost: 40,
+    effect: "+15 Morale",
+    weekUnlock: 6,
+  },
+];
+
 // ============================================================================
 // Archetypes
 // ============================================================================
