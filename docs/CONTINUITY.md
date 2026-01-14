@@ -15,8 +15,9 @@
 - [x] Authentication với mock auth (ready for Supabase integration)
 - [x] Route injection từ plugins
 - [x] Shared state cho plugin communication
-- [ ] Tạo plugin đầu tiên (Notes/Tasks)
+- [x] Tạo plugin đầu tiên (Habit RPG v2)
 - [ ] Integration với real auth provider
+- [ ] Command Palette full implementation
 
 ---
 
@@ -29,23 +30,26 @@
 - [x] Router với dynamic plugin route injection
 - [x] Zustand state management (hub store, auth store)
 - [x] Plugin template (`src/plugins/_template/`)
-- [x] Documentation (README, ARCHITECTURE, RULES)
+- [x] Habit RPG v2 Core mechanics (XP, Level, Stats, Streak)
+- [x] Habit RPG v2 UI (Dashboard, HeroPanel, QuestList)
+- [x] Documentation (README, ARCHITECTURE, RULES, HABIT-RPG-V2)
 - [x] VSCode settings cho better DX
 
 ---
 
 ## 🔄 Now
 
-- [ ] Reload IDE TypeScript server để clear false positive errors
-- [ ] Verify app works correctly at http://localhost:5173
+- [ ] Triển khai Skill Tree UI cho Habit RPG
+- [ ] Triển khai Weekly Boss encounter page
+- [ ] Fix các cảnh báo TypeScript còn sót lại
 
 ---
 
 ## ⏭️ Next
 
-- [ ] Tạo plugin Notes app
+- [ ] Archetype selection system (Week 3)
 - [ ] Integrate Supabase Auth (thay mock auth)
-- [ ] Add Command Palette (Ctrl+K)
+- [ ] Enhance Command Palette (Ctrl+K) với nhiều action hơn
 - [ ] Implement Settings page functionality
 - [ ] Add theme persistence
 
@@ -100,4 +104,4 @@ npm run dev  # http://localhost:5173
 
 ---
 
-_Last updated: 2026-01-14 07:31_
+_Last updated: 2026-01-14 09:35_

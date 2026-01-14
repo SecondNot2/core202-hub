@@ -1,0 +1,131 @@
+/**
+ * QuestList - Today's quests panel
+ */
+
+import React from "react";
+import { useGameStore } from "../../store";
+import { QuestCard } from "./QuestCard";
+import { getGameDate } from "../../domain/rules";
+
+export const QuestList: React.FC = () => {
+  const quests = useGameStore((s) => s.quests);
+  const settings = useGameStore((s) => s.settings);
+  const completeQuest = useGameStore((s) => s.completeQuest);
+  const skipQuest = useGameStore((s) => s.skipQuest);
+  const useGraceToken = useGameStore((s) => s.useGraceToken);
+
+  const today = getGameDate(settings.timezone, settings.dayBoundaryHour);
+  const todayQuests = quests.filter((q) => q.date === today);
+
+  const pendingQuests = todayQuests.filter((q) => q.status === "pending");
+  const completedQuests = todayQuests.filter((q) => q.status === "completed");
+  const otherQuests = todayQuests.filter(
+    (q) => q.status === "skipped" || q.status === "grace"
+  );
+
+  const completionPercent =
+    todayQuests.length > 0
+      ? Math.round((completedQuests.length / todayQuests.length) * 100)
+      : 0;
+
+  return (
+    <div className="bg-slate-800/30 backdrop-blur rounded-2xl border border-slate-700/50 p-5">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+            <span className="text-2xl">📋</span> Today's Quests
+          </h3>
+          <p className="text-slate-400 text-sm mt-0.5">
+            {completedQuests.length} / {todayQuests.length} completed
+          </p>
+        </div>
+
+        {/* Progress Ring */}
+        <div className="relative w-14 h-14">
+          <svg className="w-full h-full transform -rotate-90">
+            <circle
+              cx="28"
+              cy="28"
+              r="24"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+              className="text-slate-700"
+            />
+            <circle
+              cx="28"
+              cy="28"
+              r="24"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+              strokeDasharray={`${completionPercent * 1.51} 151`}
+              className="text-green-500"
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">
+            {completionPercent}%
+          </div>
+        </div>
+      </div>
+
+      {/* Quest List */}
+      <div className="space-y-3">
+        {todayQuests.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-slate-500">No quests for today.</p>
+            <p className="text-slate-600 text-sm mt-1">
+              Add habits to generate daily quests!
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Pending */}
+            {pendingQuests.map((quest) => (
+              <QuestCard
+                key={quest.id}
+                quest={quest}
+                onComplete={completeQuest}
+                onSkip={skipQuest}
+                onUseGrace={useGraceToken}
+              />
+            ))}
+
+            {/* Completed */}
+            {completedQuests.length > 0 && (
+              <div className="pt-3 border-t border-slate-700/50">
+                <p className="text-sm text-slate-500 mb-2">Completed</p>
+                {completedQuests.map((quest) => (
+                  <QuestCard
+                    key={quest.id}
+                    quest={quest}
+                    onComplete={completeQuest}
+                    onSkip={skipQuest}
+                    onUseGrace={useGraceToken}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Skipped/Grace */}
+            {otherQuests.length > 0 && (
+              <div className="pt-3 border-t border-slate-700/50">
+                <p className="text-sm text-slate-500 mb-2">Skipped / Grace</p>
+                {otherQuests.map((quest) => (
+                  <QuestCard
+                    key={quest.id}
+                    quest={quest}
+                    onComplete={completeQuest}
+                    onSkip={skipQuest}
+                    onUseGrace={useGraceToken}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};

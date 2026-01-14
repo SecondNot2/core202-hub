@@ -42,6 +42,20 @@ A modern, high-performance web application built with React, TypeScript, and Vit
 - `src/core`: Core layouts, services, and shared utilities.
 - `src/pages`: Application pages and routing.
 - `src/components`: Reusable UI components.
+- `src/plugins`: Modular plugin system with independent apps.
+
+## 🕹️ Plugins
+
+### 🎮 Habit RPG v2 (Advanced Gamification)
+
+A deep RPG progression system designed for long-term habit formation.
+
+- **RPG Model**: 5 core stats (STR, INT, DEX, WIS, VIT), Energy, and Morale.
+- **Quest System**: Habits are automatically converted into daily quests with dynamic rewards.
+- **Progression**: 12-week guided progression with week-gated feature unlocks.
+- **Economy**: Earn Gold, Essence Shards, and Relics to spend on skills and crafts.
+- **Boss System**: Weekly bosses generated based on your habit performance/weaknesses.
+- **Streak Protection**: Built-in grace tokens, streak shields, and recovery days.
 
 ## 📜 Scripts
 

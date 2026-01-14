@@ -13,6 +13,7 @@ import { registerPlugin } from "@core/plugin-system";
 
 // Import manifests (these are small, so we import them eagerly)
 import { manifest as templateManifest } from "./_template/manifest";
+import { manifest as habitRpgManifest } from "./habit-rpg/manifest";
 
 /**
  * Register all plugins
@@ -25,16 +26,8 @@ export function registerAllPlugins(): void {
   // Comment out or remove in production
   registerPlugin(templateManifest, () => import("./_template"));
 
-  // Add more plugins here:
-  // registerPlugin(
-  //   notesManifest,
-  //   () => import('./notes')
-  // );
-  //
-  // registerPlugin(
-  //   tasksManifest,
-  //   () => import('./tasks')
-  // );
+  // Habit RPG Plugin v2
+  registerPlugin(habitRpgManifest, () => import("./habit-rpg"));
 }
 
 /**
