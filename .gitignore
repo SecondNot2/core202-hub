@@ -2,9 +2,6 @@
 node_modules/
 .pnp
 .pnp.js
-.shared/
-.agent/
-.gemini/
 
 # Build outputs
 dist/

@@ -1,140 +1,55 @@
 # Core202 Hub
 
-A personal tool hub (personal operating system) built with React, TypeScript, and TailwindCSS.
+A modern, high-performance web application built with React, TypeScript, and Vite. Core202 Hub focuses on delivering a sleek user experience with a robust architectural foundation.
 
-## Features
+## 🚀 Technologies
 
-- **Plugin Architecture**: Modular applications that can be registered, mounted, and navigated independently
-- **Authentication**: Built-in auth system with role-based access control
-- **Theme Support**: Light/dark/system theme switching
-- **Notification System**: Toast notifications for user feedback
-- **Command System**: Global command palette support
+- **Frontend:** [React](https://reactjs.org/) (v18)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Build Tool:** [Vite](https://vitejs.dev/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **State Management:** [Zustand](https://github.com/pmndrs/zustand)
+- **Routing:** [React Router](https://reactrouter.com/)
 
-## 📚 Documentation
-
-| Document                               | Description                                             |
-| -------------------------------------- | ------------------------------------------------------- |
-| [Architecture](./docs/ARCHITECTURE.md) | System design, data flow, component diagrams            |
-| [Workspace Rules](./docs/RULES.md)     | Coding conventions, best practices, security guidelines |
-| [Continuity](./docs/CONTINUITY.md)     | Project state tracking, session notes                   |
-
-## Getting Started
+## 🛠️ Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js (Latest LTS recommended)
 - npm or yarn
 
 ### Installation
 
-```bash
-# Install dependencies
-npm install
+1. Clone the repository:
 
-# Start development server
-npm run dev
+   ```bash
+   git clone https://github.com/SecondNot2/core202-hub.git
+   ```
 
-# Build for production
-npm run build
-```
+2. Install dependencies:
 
-### Development
+   ```bash
+   npm install
+   ```
 
-The application runs at `http://localhost:5173` by default.
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-**Demo Login:**
+## 🏗️ Project Structure
 
-- Any email/password combination works
-- Include "admin" in the email for admin role
+- `src/core`: Core layouts, services, and shared utilities.
+- `src/pages`: Application pages and routing.
+- `src/components`: Reusable UI components.
 
-## Project Structure
+## 📜 Scripts
 
-```
-core202-hub/
-├── docs/                    # 📚 Documentation
-│   ├── ARCHITECTURE.md      # System design
-│   ├── RULES.md             # Workspace rules
-│   └── CONTINUITY.md        # Session tracking
-│
-├── src/
-│   ├── core/                # Hub core systems
-│   │   ├── auth/            # Authentication & authorization
-│   │   ├── layout/          # Shell layout components
-│   │   ├── plugin-system/   # Plugin registry & lifecycle
-│   │   ├── router/          # Centralized routing
-│   │   └── store/           # Global state (Zustand)
-│   │
-│   ├── plugins/             # Modular applications
-│   │   ├── _template/       # Plugin template
-│   │   └── [plugin-name]/   # Each plugin folder
-│   │
-│   ├── shared/              # Shared utilities
-│   │   ├── hooks/           # Reusable hooks
-│   │   ├── types/           # TypeScript interfaces
-│   │   └── utils/           # Utility functions
-│   │
-│   ├── pages/               # Core pages
-│   ├── App.tsx              # Root application
-│   └── main.tsx             # Entry point
-│
-├── .vscode/                 # VSCode settings
-├── package.json
-└── README.md
-```
+- `npm run dev`: Start development server.
+- `npm run build`: Build for production.
+- `npm run lint`: Run ESLint checks.
+- `npm run preview`: Preview the production build locally.
 
-## Creating a Plugin
+---
 
-1. Copy the `src/plugins/_template` folder
-2. Rename it to your plugin name (e.g., `notes`)
-3. Update `manifest.ts` with your plugin details
-4. Define routes in `routes.tsx`
-5. Build your components
-6. Register the plugin in `src/plugins/index.ts`:
-
-```typescript
-import { manifest as notesManifest } from "./notes/manifest";
-
-registerPlugin(notesManifest, () => import("./notes"));
-```
-
-> 📖 See [RULES.md](./docs/RULES.md) for detailed plugin development guidelines.
-
-## Plugin API
-
-Plugins receive a `PluginAPI` object with these methods:
-
-| Method                       | Description                    |
-| ---------------------------- | ------------------------------ |
-| `getUser()`                  | Get current authenticated user |
-| `hasPermission(permission)`  | Check user permission          |
-| `navigate(path)`             | Navigate to a route            |
-| `notify(message, type)`      | Show notification              |
-| `getSharedState(key)`        | Get shared state value         |
-| `setSharedState(key, value)` | Set shared state value         |
-| `registerCommand(command)`   | Register a global command      |
-| `emit(event, payload)`       | Emit global event              |
-| `on(event, callback)`        | Subscribe to global event      |
-
-## Technology Stack
-
-| Technology     | Purpose          |
-| -------------- | ---------------- |
-| React 18       | UI library       |
-| TypeScript     | Type safety      |
-| TailwindCSS 3  | Styling          |
-| Vite           | Build tool       |
-| React Router 6 | Routing          |
-| Zustand        | State management |
-
-## Scripts
-
-```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run preview  # Preview production build
-npm run lint     # Run ESLint
-```
-
-## License
-
-MIT
+Built with ❤️ by [SecondNot2](https://github.com/SecondNot2)
