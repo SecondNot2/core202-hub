@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { AuthProvider } from "@core/auth";
 import { AppRouter } from "@core/router";
 import { registerAllPlugins, autoLoadPlugins } from "@plugins/index";
+import { ToastProvider, ConfirmProvider } from "@shared/components";
 
 // Register plugins on app load
 registerAllPlugins();
@@ -28,9 +29,13 @@ export const App: React.FC = () => {
   }
 
   return (
-    <AuthProvider>
-      <AppRouter />
-    </AuthProvider>
+    <ToastProvider>
+      <ConfirmProvider>
+        <AuthProvider>
+          <AppRouter />
+        </AuthProvider>
+      </ConfirmProvider>
+    </ToastProvider>
   );
 };
 

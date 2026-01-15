@@ -82,7 +82,20 @@ registered → loading → active ⟷ disabled
 - Dynamically injects plugin routes
 - Supports lazy loading of route components
 
-### 4. State Management
+### 4. Layout & UI Components
+
+**Sidebar** (`core/layout/Sidebar.tsx`)
+
+- Nested navigation support for plugins.
+- Hover-expansion mechanism for collapsed state.
+- Glassmorphism design with dynamic active states.
+
+**Notification System** (`core/layout/NotificationPanel.tsx`)
+
+- Centralized dropdown for hub and plugin events.
+- Integrated with Hub Store and Plugin specific stores (e.g. GameStore).
+
+### 5. State Management
 
 **Hub Store** (`core/store/hub.ts`)
 

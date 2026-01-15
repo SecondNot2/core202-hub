@@ -9,10 +9,9 @@ import { Link } from "react-router-dom";
 
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
-  const { getActivePlugins, getAllPlugins } = usePluginRegistry();
+  const { getActivePlugins } = usePluginRegistry();
 
   const activePlugins = getActivePlugins();
-  const allPlugins = getAllPlugins();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -43,10 +42,15 @@ export const HomePage: React.FC = () => {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
-            <button className="glass-button">Explore Apps</button>
-            <button className="px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium text-gray-700 dark:text-gray-300">
+            <Link to="/settings" className="glass-button">
+              Explore Apps
+            </Link>
+            <Link
+              to="/settings"
+              className="px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium text-gray-700 dark:text-gray-300"
+            >
               Customize Layout
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -90,9 +94,12 @@ export const HomePage: React.FC = () => {
             <span className="w-2 h-8 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 block" />
             Your Applications
           </h2>
-          <button className="text-sm font-medium text-violet-600 dark:text-violet-400 hover:underline">
+          <Link
+            to="/settings"
+            className="text-sm font-medium text-violet-600 dark:text-violet-400 hover:underline"
+          >
             View All
-          </button>
+          </Link>
         </div>
 
         {activePlugins.length === 0 ? (
@@ -107,9 +114,12 @@ export const HomePage: React.FC = () => {
               Your hub is empty. Head to the registry to install new plugins and
               extend your workspace.
             </p>
-            <button className="px-6 py-2.5 bg-gray-900 dark:bg-gray-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+            <Link
+              to="/settings"
+              className="px-6 py-2.5 bg-gray-900 dark:bg-gray-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+            >
               Browse Registry
-            </button>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

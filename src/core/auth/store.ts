@@ -107,6 +107,28 @@ export const useAuthStore = create<AuthStore>()(
           });
         }
       },
+
+      updateProfile: async (data: Partial<User>) => {
+        const { user } = get();
+        if (!user) return;
+
+        set({ isLoading: true, error: null });
+
+        try {
+          // Mock API call
+          await mockDelay(500);
+
+          set({
+            user: { ...user, ...data },
+            isLoading: false,
+          });
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Update failed";
+          set({ isLoading: false, error: message });
+          throw error;
+        }
+      },
     }),
     {
       name: "core202-auth",

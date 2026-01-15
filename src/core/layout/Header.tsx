@@ -2,19 +2,41 @@
  * Header Component - Floating Glass Header
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@core/auth";
 import { useHubStore } from "@core/store";
+import { useConfirm } from "@shared/components";
+import { NotificationPanel } from "./NotificationPanel";
+import { Link } from "react-router-dom";
 
 export const Header: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const theme = useHubStore((state) => state.theme);
   const setTheme = useHubStore((state) => state.setTheme);
+  const notifications = useHubStore((state) => state.notifications);
+  const { confirm } = useConfirm();
+
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const toggleTheme = () => {
     const nextTheme =
       theme === "dark" ? "light" : theme === "light" ? "system" : "dark";
     setTheme(nextTheme);
+  };
+
+  const handleLogout = async () => {
+    const confirmed = await confirm({
+      title: "Log out?",
+      message: "Are you sure you want to sign out?",
+      variant: "danger",
+      confirmText: "Log Out",
+      cancelText: "Cancel",
+      icon: "👋",
+    });
+
+    if (confirmed) {
+      logout();
+    }
   };
 
   const getThemeIcon = () => {
@@ -29,7 +51,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="glass-panel h-16 px-4 flex items-center justify-between rounded-2xl transition-all duration-300">
+    <header className="glass-panel h-16 px-4 flex items-center justify-between rounded-2xl transition-all duration-300 relative z-40">
       {/* Search Bar */}
       <div className="flex-1 max-w-lg">
         <div className="relative group">
@@ -59,10 +81,22 @@ export const Header: React.FC = () => {
         </button>
 
         {/* Notifications */}
-        <button className="relative p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-all duration-200 active:scale-95">
-          <BellIcon />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900 animate-pulse"></span>
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-all duration-200 active:scale-95"
+          >
+            <BellIcon />
+            {notifications.length > 0 && (
+              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900 animate-pulse"></span>
+            )}
+          </button>
+
+          <NotificationPanel
+            isOpen={showNotifications}
+            onClose={() => setShowNotifications(false)}
+          />
+        </div>
 
         <div className="w-px h-8 bg-gray-200 dark:bg-gray-700 mx-2" />
 
@@ -85,14 +119,24 @@ export const Header: React.FC = () => {
                 </div>
               </button>
 
-              {/* Dropdown would go here */}
-              <button
-                onClick={() => logout()}
-                className="absolute top-12 right-0 w-32 p-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-50 flex items-center gap-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
-              >
-                <LogoutIcon />
-                Logout
-              </button>
+              {/* Dropdown */}
+              <div className="absolute top-12 right-0 w-48 p-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-50">
+                <Link
+                  to="/settings"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
+                  <span className="text-lg">👤</span>
+                  Profile
+                </Link>
+                <div className="h-px bg-gray-100 dark:bg-gray-700 my-1" />
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  <LogoutIcon />
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         )}

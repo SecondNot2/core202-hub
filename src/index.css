@@ -83,3 +83,118 @@
   0% { opacity: 0.8; }
   100% { opacity: 1; filter: hue-rotate(15deg); }
 }
+
+/* ============================================================================
+   UI Component Animations
+   ============================================================================ */
+
+/* Toast Animations */
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toast-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%) scale(0.9);
+  }
+}
+
+.animate-toast-enter {
+  animation: toast-enter 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+.animate-toast-exit {
+  animation: toast-exit 0.25s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+/* Modal Animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+/* Dropdown Animations */
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-dropdown-enter {
+  animation: dropdown-enter 0.2s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+/* Bounce Once (for confirm icons) */
+@keyframes bounce-once {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.1); }
+  50% { transform: scale(0.95); }
+  75% { transform: scale(1.05); }
+}
+
+.animate-bounce-once {
+  animation: bounce-once 0.5s ease-out;
+}
+
+/* Shake Animation (for errors) */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* Slide Up (utility) */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}

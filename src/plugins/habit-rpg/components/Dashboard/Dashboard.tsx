@@ -1,22 +1,93 @@
 /**
  * Dashboard - Main RPG dashboard view
+ * Features: Hero stats, Quests, Habit management, Real-time stats
  */
 
 import React, { useEffect, useState } from "react";
+import { useRef } from "react";
+import { Link } from "react-router-dom";
 import { useGameStore } from "../../store";
 import { HeroPanel } from "../Character";
-import { QuestList, HabitForm } from "../Quests";
+import { QuestList, HabitFormModal } from "../Quests";
+import { useConfirm, useToast } from "@shared/components";
+import type { Habit } from "../../domain/types";
 
 export const Dashboard: React.FC = () => {
   const initializeGame = useGameStore((s) => s.initializeGame);
   const habits = useGameStore((s) => s.habits);
   const season = useGameStore((s) => s.season);
+  const streak = useGameStore((s) => s.streak);
+  const character = useGameStore((s) => s.character);
+  const inventory = useGameStore((s) => s.inventory);
+  const quests = useGameStore((s) => s.quests);
+  const deleteHabit = useGameStore((s) => s.deleteHabit);
+  const toggleHabit = useGameStore((s) => s.toggleHabit);
+
+  const { confirm } = useConfirm();
+  const { toast } = useToast();
 
   const [showHabitForm, setShowHabitForm] = useState(false);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setActiveMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleEditHabit = (habit: Habit) => {
+    setEditingHabit(habit);
+    setShowHabitForm(true);
+    setActiveMenuId(null);
+  };
+
+  const handleAddHabit = () => {
+    setEditingHabit(null);
+    setShowHabitForm(true);
+  };
+
+  // Calculate today's quests stats
+  const today = new Date().toISOString().split("T")[0];
+  const todayQuests = quests.filter((q) => q.date === today);
+  const completedToday = todayQuests.filter(
+    (q) => q.status === "completed"
+  ).length;
 
   useEffect(() => {
     initializeGame();
   }, [initializeGame]);
+
+  const handleDeleteHabit = async (habit: Habit) => {
+    setActiveMenuId(null);
+    const confirmed = await confirm({
+      title: "Delete Habit?",
+      message: `Are you sure you want to delete "${habit.title}"? This cannot be undone.`,
+      variant: "danger",
+      confirmText: "Delete",
+      cancelText: "Keep",
+    });
+
+    if (confirmed) {
+      deleteHabit(habit.id);
+      toast.info(`"${habit.title}" has been deleted`);
+    }
+  };
+
+  const handleToggleHabit = (habit: Habit) => {
+    toggleHabit(habit.id);
+    setActiveMenuId(null);
+    toast.info(
+      habit.isActive ? `"${habit.title}" paused` : `"${habit.title}" activated`
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/30 to-slate-950 p-4 md:p-6">
@@ -33,11 +104,39 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setShowHabitForm(!showHabitForm)}
-            className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition-colors flex items-center gap-2"
+            onClick={handleAddHabit}
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium transition-all hover:scale-105 shadow-lg shadow-purple-500/25 flex items-center gap-2"
           >
-            <span>+</span> Add Habit
+            <span className="text-lg">+</span> Add Habit
           </button>
+        </div>
+
+        {/* Quick Stats Bar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard
+            icon="🔥"
+            label="Streak"
+            value={`${streak.currentStreak} days`}
+            color="from-orange-500 to-red-500"
+          />
+          <StatCard
+            icon="⚡"
+            label="Energy"
+            value={`${character.energy}/${character.maxEnergy}`}
+            color="from-yellow-500 to-amber-500"
+          />
+          <StatCard
+            icon="💰"
+            label="Gold"
+            value={inventory.gold.toString()}
+            color="from-amber-400 to-yellow-500"
+          />
+          <StatCard
+            icon="✅"
+            label="Today"
+            value={`${completedToday}/${todayQuests.length}`}
+            color="from-green-500 to-emerald-500"
+          />
         </div>
 
         {/* Hero Panel */}
@@ -52,70 +151,172 @@ export const Dashboard: React.FC = () => {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            {/* Habit Form */}
-            {showHabitForm && (
-              <HabitForm onClose={() => setShowHabitForm(false)} />
-            )}
-
-            {/* Habit List Summary */}
+            {/* Habit List Management */}
             <div className="bg-slate-800/30 backdrop-blur rounded-xl border border-slate-700/50 p-4">
-              <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                <span>📝</span> Your Habits
-              </h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span>📝</span> Your Habits
+                </h3>
+                <span className="text-xs text-slate-500">
+                  {habits.filter((h) => h.isActive).length} active
+                </span>
+              </div>
 
               {habits.length === 0 ? (
-                <p className="text-slate-500 text-sm">
-                  No habits configured yet.
+                <p className="text-slate-500 text-sm text-center py-4">
+                  No habits yet.{" "}
+                  <button
+                    onClick={handleAddHabit}
+                    className="text-purple-400 hover:text-purple-300"
+                  >
+                    Create one!
+                  </button>
                 </p>
               ) : (
-                <div className="space-y-2">
-                  {habits
-                    .filter((h) => h.isActive)
-                    .map((habit) => (
-                      <div
-                        key={habit.id}
-                        className="flex items-center justify-between p-2 rounded-lg bg-slate-700/30"
-                      >
-                        <div>
-                          <span className="text-white text-sm">
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {habits.map((habit) => (
+                    <div
+                      key={habit.id}
+                      className={`
+                        flex items-center justify-between p-3 rounded-lg transition-all
+                        ${
+                          habit.isActive
+                            ? "bg-slate-700/30"
+                            : "bg-slate-700/10 opacity-60"
+                        }
+                      `}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`text-sm font-medium truncate ${
+                              habit.isActive
+                                ? "text-white"
+                                : "text-slate-400 line-through"
+                            }`}
+                          >
                             {habit.title}
                           </span>
-                          <span className="text-slate-500 text-xs ml-2">
-                            {"⭐".repeat(habit.difficulty)}
-                          </span>
                         </div>
-                        <span className="text-xs text-slate-400">
-                          {habit.effortMinutes}min
-                        </span>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                          <span>{"⭐".repeat(habit.difficulty)}</span>
+                          <span>•</span>
+                          <span>{habit.effortMinutes}min</span>
+                        </div>
                       </div>
-                    ))}
+
+                      {/* Actions using 3-dot menu */}
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMenuId(
+                              activeMenuId === habit.id ? null : habit.id
+                            );
+                          }}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                        >
+                          ⋮
+                        </button>
+
+                        {activeMenuId === habit.id && (
+                          <div
+                            ref={menuRef}
+                            className="absolute right-0 top-full mt-1 w-32 bg-slate-800 rounded-lg shadow-xl border border-slate-700 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100"
+                          >
+                            <button
+                              onClick={() => handleEditHabit(habit)}
+                              className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2"
+                            >
+                              ✏️ Edit
+                            </button>
+                            <button
+                              onClick={() => handleToggleHabit(habit)}
+                              className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2"
+                            >
+                              {habit.isActive ? "⏸️ Pause" : "▶️ Resume"}
+                            </button>
+                            <div className="h-px bg-slate-700 my-0.5" />
+                            <button
+                              onClick={() => handleDeleteHabit(habit)}
+                              className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 flex items-center gap-2"
+                            >
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Quick Stats */}
+            {/* Quick Links */}
             <div className="bg-slate-800/30 backdrop-blur rounded-xl border border-slate-700/50 p-4">
               <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                <span>📊</span> Quick Stats
+                <span>🚀</span> Quick Access
               </h3>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-slate-700/30 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold text-green-400">
-                    {habits.filter((h) => h.isActive).length}
-                  </div>
-                  <div className="text-slate-400">Active Habits</div>
-                </div>
-                <div className="bg-slate-700/30 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold text-purple-400">
-                    {season.unlockedFeatures.length}
-                  </div>
-                  <div className="text-slate-400">Features</div>
-                </div>
+              <div className="grid grid-cols-2 gap-2">
+                <QuickLink to="/rpg/character" icon="👤" label="Character" />
+                <QuickLink to="/rpg/skills" icon="✨" label="Skill Tree" />
+                <QuickLink to="/rpg/boss" icon="👹" label="Boss" />
+                <QuickLink to="/rpg/crafting" icon="⚗️" label="Crafting" />
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Habit Form Modal */}
+      <HabitFormModal
+        isOpen={showHabitForm}
+        onClose={() => setShowHabitForm(false)}
+        editHabit={editingHabit}
+      />
     </div>
   );
 };
+
+// ============================================================================
+// Sub-components
+// ============================================================================
+
+interface StatCardProps {
+  icon: string;
+  label: string;
+  value: string;
+  color: string;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ icon, label, value, color }) => (
+  <div className="bg-slate-800/30 backdrop-blur rounded-xl border border-slate-700/50 p-3">
+    <div className="flex items-center gap-3">
+      <div
+        className={`w-10 h-10 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center text-lg shadow-lg`}
+      >
+        {icon}
+      </div>
+      <div>
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-lg font-bold text-white">{value}</p>
+      </div>
+    </div>
+  </div>
+);
+
+interface QuickLinkProps {
+  to: string;
+  icon: string;
+  label: string;
+}
+
+const QuickLink: React.FC<QuickLinkProps> = ({ to, icon, label }) => (
+  <Link
+    to={to}
+    className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 hover:text-white transition-all text-sm"
+  >
+    <span>{icon}</span>
+    <span>{label}</span>
+  </Link>
+);

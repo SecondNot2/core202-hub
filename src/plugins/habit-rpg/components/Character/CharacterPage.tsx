@@ -9,7 +9,6 @@ import { ArchetypeSelector } from "./ArchetypeSelector";
 
 export const CharacterPage: React.FC = () => {
   const character = useGameStore((s) => s.character);
-  const inventory = useGameStore((s) => s.inventory);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950/20 to-slate-950 p-4 md:p-6">

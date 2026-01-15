@@ -52,10 +52,26 @@ A deep RPG progression system designed for long-term habit formation.
 
 - **RPG Model**: 5 core stats (STR, INT, DEX, WIS, VIT), Energy, and Morale.
 - **Quest System**: Habits are automatically converted into daily quests with dynamic rewards.
+- **Habit Management**: Advanced management with Edit/Pause/Delete actions and 3-dot menus.
 - **Progression**: 12-week guided progression with week-gated feature unlocks.
 - **Economy**: Earn Gold, Essence Shards, and Relics to spend on skills and crafts.
 - **Boss System**: Weekly bosses generated based on your habit performance/weaknesses.
 - **Streak Protection**: Built-in grace tokens, streak shields, and recovery days.
+
+## 🎨 UI/UX Features
+
+- **Glassmorphism Design**: Modern, transparent UI with vibrant gradients.
+- **Advanced Navigation- **Hub Store\*\* (`core/store/hub.ts`)
+
+  - Global UI state (sidebar, theme)
+  - Notification queue
+  - Command registry
+  - Shared state for plugin communication
+
+- **Notification System** (`core/layout/NotificationPanel.tsx`)
+  - Aggregates system alerts and plugin-specific events (e.g., RPG level ups)
+  - Floating dropdown design with persistence via Hub Store.s and game event logs.
+- **Profile Management**: Custom user profiles with avatar synchronization.
 
 ## 📜 Scripts
 

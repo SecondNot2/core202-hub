@@ -292,7 +292,7 @@ export const useGameStore = create<GameStore>()(
         })),
 
       // ===== Habits =====
-      addHabit: (habitData) =>
+      addHabit: (habitData) => {
         set((state) => ({
           habits: [
             ...state.habits,
@@ -306,7 +306,10 @@ export const useGameStore = create<GameStore>()(
               updatedAt: Date.now(),
             },
           ],
-        })),
+        }));
+        // Generate quest for the newly added habit
+        get().generateTodayQuests();
+      },
 
       updateHabit: (id, updates) =>
         set((state) => ({
@@ -337,12 +340,20 @@ export const useGameStore = create<GameStore>()(
           state.settings.dayBoundaryHour
         );
 
-        // Check if already generated for today
+        // Get existing quest habit IDs for today
         const todayQuests = state.quests.filter((q) => q.date === today);
-        if (todayQuests.length > 0) return;
+        const existingHabitIds = new Set(todayQuests.map((q) => q.habitId));
+
+        // Find habits that don't have quests yet
+        const habitsWithoutQuests = state.habits.filter(
+          (h) => h.isActive && !existingHabitIds.has(h.id)
+        );
+
+        // If no new habits need quests, return early
+        if (habitsWithoutQuests.length === 0) return;
 
         const params = get().getXpParams();
-        const newQuests = generateDailyQuests(state.habits, today, {
+        const newQuests = generateDailyQuests(habitsWithoutQuests, today, {
           ...params,
           difficulty: 1,
           effortMinutes: 10,
@@ -400,20 +411,31 @@ export const useGameStore = create<GameStore>()(
         get().earnGold(goldReward);
         get().adjustMorale(2);
 
-        // Update streak
+        // Update streak - only increment once per day
         set((s) => {
-          const newStreak = s.streak.currentStreak + 1;
-          const earnedShield = checkStreakShieldEarned(
-            newStreak,
-            STREAK_SHIELD_INTERVAL,
-            s.streak.streakShields
+          const today = getGameDate(
+            state.settings.timezone,
+            state.settings.dayBoundaryHour
           );
+          const isNewDayCompletion = s.streak.lastCompletedDate !== today;
+          const newStreak = isNewDayCompletion
+            ? s.streak.currentStreak + 1
+            : s.streak.currentStreak;
+
+          const earnedShield = isNewDayCompletion
+            ? checkStreakShieldEarned(
+                newStreak,
+                STREAK_SHIELD_INTERVAL,
+                s.streak.streakShields
+              )
+            : false;
 
           return {
             streak: {
               ...s.streak,
               currentStreak: newStreak,
               longestStreak: Math.max(s.streak.longestStreak, newStreak),
+              lastCompletedDate: today,
               streakShields: earnedShield
                 ? s.streak.streakShields + 1
                 : s.streak.streakShields,

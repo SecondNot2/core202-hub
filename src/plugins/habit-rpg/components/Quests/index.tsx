@@ -4,4 +4,4 @@
 
 export { QuestCard } from "./QuestCard";
 export { QuestList } from "./QuestList";
-export { HabitForm } from "./HabitForm";
+export { HabitForm, HabitFormModal } from "./HabitForm";

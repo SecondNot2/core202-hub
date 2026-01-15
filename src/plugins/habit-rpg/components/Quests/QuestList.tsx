@@ -1,11 +1,12 @@
 /**
- * QuestList - Today's quests panel
+ * QuestList - Today's quests panel with ConfirmDialog and Toast
  */
 
 import React from "react";
 import { useGameStore } from "../../store";
 import { QuestCard } from "./QuestCard";
 import { getGameDate } from "../../domain/rules";
+import { useConfirm, useToast } from "@shared/components";
 
 export const QuestList: React.FC = () => {
   const quests = useGameStore((s) => s.quests);
@@ -13,6 +14,10 @@ export const QuestList: React.FC = () => {
   const completeQuest = useGameStore((s) => s.completeQuest);
   const skipQuest = useGameStore((s) => s.skipQuest);
   const useGraceToken = useGameStore((s) => s.useGraceToken);
+  const character = useGameStore((s) => s.character);
+
+  const { confirm } = useConfirm();
+  const { toast } = useToast();
 
   const today = getGameDate(settings.timezone, settings.dayBoundaryHour);
   const todayQuests = quests.filter((q) => q.date === today);
@@ -27,6 +32,49 @@ export const QuestList: React.FC = () => {
     todayQuests.length > 0
       ? Math.round((completedQuests.length / todayQuests.length) * 100)
       : 0;
+
+  const handleComplete = async (questId: string) => {
+    const quest = quests.find((q) => q.id === questId);
+    if (!quest) return;
+
+    // Check energy first
+    const energyCost = Math.ceil(quest.effortMinutes / 4);
+    if (character.energy < energyCost) {
+      toast.error(`Not enough energy! Need ${energyCost}⚡`);
+      return;
+    }
+
+    const confirmed = await confirm({
+      title: "Complete Quest?",
+      message: `You'll earn +${quest.xpReward} XP and +${quest.goldReward} Gold for completing "${quest.habitTitle}"`,
+      variant: "info",
+      confirmText: "Complete ✓",
+      cancelText: "Not yet",
+    });
+
+    if (confirmed) {
+      completeQuest(questId);
+      toast.success(`🎉 Quest completed! +${quest.xpReward} XP`);
+    }
+  };
+
+  const handleSkip = async (questId: string) => {
+    const quest = quests.find((q) => q.id === questId);
+    if (!quest) return;
+
+    const confirmed = await confirm({
+      title: "Skip Quest?",
+      message: `Are you sure you want to skip "${quest.habitTitle}"? This may affect your streak.`,
+      variant: "warning",
+      confirmText: "Skip",
+      cancelText: "Keep",
+    });
+
+    if (confirmed) {
+      skipQuest(questId);
+      toast.info("Quest skipped");
+    }
+  };
 
   return (
     <div className="bg-slate-800/30 backdrop-blur rounded-2xl border border-slate-700/50 p-5">
@@ -86,8 +134,8 @@ export const QuestList: React.FC = () => {
               <QuestCard
                 key={quest.id}
                 quest={quest}
-                onComplete={completeQuest}
-                onSkip={skipQuest}
+                onComplete={handleComplete}
+                onSkip={handleSkip}
                 onUseGrace={useGraceToken}
               />
             ))}
@@ -100,8 +148,8 @@ export const QuestList: React.FC = () => {
                   <QuestCard
                     key={quest.id}
                     quest={quest}
-                    onComplete={completeQuest}
-                    onSkip={skipQuest}
+                    onComplete={handleComplete}
+                    onSkip={handleSkip}
                     onUseGrace={useGraceToken}
                   />
                 ))}
@@ -116,8 +164,8 @@ export const QuestList: React.FC = () => {
                   <QuestCard
                     key={quest.id}
                     quest={quest}
-                    onComplete={completeQuest}
-                    onSkip={skipQuest}
+                    onComplete={handleComplete}
+                    onSkip={handleSkip}
                     onUseGrace={useGraceToken}
                   />
                 ))}

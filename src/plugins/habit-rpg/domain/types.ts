@@ -225,6 +225,7 @@ export type EventType =
   | "boss_defeated"
   | "skill_unlocked"
   | "item_purchased"
+  | "item_crafted"
   | "streak_broken"
   | "streak_milestone";
 

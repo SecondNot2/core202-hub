@@ -213,6 +213,7 @@ export interface AuthActions {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
 // ============================================================================
