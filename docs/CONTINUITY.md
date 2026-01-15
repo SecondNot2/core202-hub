@@ -37,6 +37,10 @@
 - [x] Habit RPG v2 Boss Encounter & Damage logic
 - [x] Habit RPG v2 Archetype Selection (Week 3 unlock)
 - [x] Habit RPG v2 Crafting System & Recipes (Week 6 unlock)
+- [x] UI/UX Polishing: Sidebar redesign (hover-expand, nested menus)
+- [x] Header enhancements: Notification Panel implementation
+- [x] Profile Management: User name and avatar editing
+- [x] Habit Management: Edit/Pause/Delete with 3-dot menus
 - [x] Documentation (README, ARCHITECTURE, RULES, HABIT-RPG-V2)
 - [x] VSCode settings cho better DX
 
@@ -45,9 +49,9 @@
 ## 🔄 Now
 
 - [ ] Triển khai Monthly Raid Boss (Week 8)
-- [ ] Triển khai Relic & Inventory system details
+- [ ] Triển khai Inventory system details (Items usage)
 - [ ] Triển khai Hybrid Class selection (Week 7)
-- [ ] Fix polishing UI/UX (animations, sound effects placeholders)
+- [ ] Enhance Command Palette (Ctrl+K) logic integration
 
 ---
 
@@ -55,17 +59,15 @@
 
 - [ ] Monthly Raid & Season Finale implementation
 - [ ] Integrate Supabase Auth (thay mock auth)
-- [ ] Enhance Command Palette (Ctrl+K) với nhiều action hơn
-- [ ] Implement Settings page functionality
-- [ ] Add theme persistence
+- [ ] Theme persistence & more appearance settings
+- [ ] Plugin Registry Store (for browsing/installing plugins)
 
 ---
 
 ## ❓ Open Questions
 
 - [UNCONFIRMED] Supabase project ID cho authentication?
-- [UNCONFIRMED] Có cần offline support không?
-- [UNCONFIRMED] Plugin nào sẽ build đầu tiên?
+- [UNCONFIRMED] Có cần offline support (Service Workers) không?
 
 ---
 
@@ -75,27 +77,27 @@
 
 ```
 src/
-├── core/plugin-system/   # Plugin registry & API
-├── core/auth/            # Authentication
-├── core/layout/          # Shell layout
-├── plugins/_template/    # Plugin template
-└── App.tsx               # Root component
+├── core/layout/          # Sidebar, Header, NotificationPanel
+├── core/auth/            # AuthStore updateProfile
+├── pages/Settings.tsx    # Profile editing UI
+└── plugins/habit-rpg/    # Dashboard & Habit management
 ```
 
 ### Running Commands
 
 ```bash
 npm run dev  # http://localhost:5173
+npx tsc --noEmit # Type checking passes
 ```
 
 ### Key Decisions
 
-| Decision                | Rationale                                                |
-| ----------------------- | -------------------------------------------------------- |
-| Zustand over Redux      | Simpler API, less boilerplate, good for plugin isolation |
-| Plugin manifest pattern | Declarative config, easy to validate, future-proof       |
-| Mock auth first         | Faster development, swap with Supabase later             |
-| TailwindCSS             | Rapid styling, consistent design tokens                  |
+| Decision                    | Rationale                                                     |
+| --------------------------- | ------------------------------------------------------------- |
+| Hover-expand Sidebar        | Access nested items quickly without losing screen real estate |
+| Unified Notification Panel  | Aggregate diverse events (System/RPG) in one visual location  |
+| Local formatTimeAgo         | Reduce dependency on external libraries (date-fns)            |
+| 3-dot menu for habit action | Reduces visual clutter while maintaining full control         |
 
 ---
 
@@ -103,11 +105,11 @@ npm run dev  # http://localhost:5173
 
 | Metric                | Value      |
 | --------------------- | ---------- |
-| Total Core Files      | ~25        |
+| Total Core Files      | ~30        |
 | Plugin Template Files | 5          |
 | TypeScript Errors     | 0          |
 | Build Status          | ✅ Passing |
 
 ---
 
-_Last updated: 2026-01-14 10:00_
+_Last updated: 2026-01-15 16:15_
