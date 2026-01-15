@@ -7,6 +7,8 @@ import { manifest } from "./manifest";
 import { routes } from "./routes";
 import type { PluginAPI } from "@shared/types";
 import { useGameStore } from "./store";
+import { startAutoSync, stopAutoSync } from "./hooks";
+import { useAuthStore } from "@core/auth/store";
 
 export default definePlugin({
   manifest,
@@ -20,14 +22,22 @@ export default definePlugin({
     },
     onUnload: () => {
       console.log(`[${manifest.id}] Plugin unloaded`);
+      stopAutoSync();
     },
     onActivate: () => {
       console.log(`[${manifest.id}] Plugin activated`);
       // Run scheduler to check resets
       useGameStore.getState().runScheduler();
+
+      // Start auto-sync if user is authenticated
+      const authState = useAuthStore.getState();
+      if (authState.isAuthenticated && authState.user?.id) {
+        startAutoSync(authState.user.id);
+      }
     },
     onDeactivate: () => {
       console.log(`[${manifest.id}] Plugin deactivated`);
+      stopAutoSync();
     },
   },
 

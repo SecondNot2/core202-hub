@@ -1,9 +1,11 @@
 /**
  * Auth Context - Provides auth utilities via React Context
+ * Integrated with Supabase Auth state changes
  */
 
 import React, { createContext, useContext, useEffect } from "react";
-import { useAuthStore } from "./store";
+import { useAuthStore, subscribeToAuthChanges } from "./store";
+import { startHubSettingsSync, stopHubSettingsSync } from "@core/store/hub";
 import type { User, AuthState, AuthActions } from "@shared/types";
 
 // ============================================================================
@@ -26,9 +28,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const store = useAuthStore();
 
-  // Check auth on mount
+  // Check auth on mount and subscribe to Supabase auth changes
   useEffect(() => {
     store.checkAuth();
+
+    // Subscribe to auth state changes from Supabase
+    const unsubscribe = subscribeToAuthChanges((isAuthenticated, userId) => {
+      if (isAuthenticated && userId) {
+        // Re-check auth to refresh user data
+        store.checkAuth();
+        // Start hub settings sync
+        startHubSettingsSync(userId);
+      } else if (!isAuthenticated) {
+        // Stop hub settings sync
+        stopHubSettingsSync();
+        // Clear local state when signed out
+        useAuthStore.setState({
+          isAuthenticated: false,
+          user: null,
+          isLoading: false,
+        });
+      }
+    });
+
+    // If already authenticated on mount, start sync
+    const currentState = useAuthStore.getState();
+    if (currentState.isAuthenticated && currentState.user?.id) {
+      startHubSettingsSync(currentState.user.id);
+    }
+
+    return () => {
+      unsubscribe();
+      stopHubSettingsSync();
+    };
   }, []);
 
   const hasPermission = (permission: string): boolean => {

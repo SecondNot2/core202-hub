@@ -1,9 +1,10 @@
 /**
- * Authentication Store - Manages user authentication state
+ * Authentication Store - Manages user authentication state via Supabase
  */
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { supabase } from "@core/supabase/client";
 import type { User, AuthState, AuthActions } from "@shared/types";
 
 // ============================================================================
@@ -26,20 +27,40 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
 
         try {
-          // TODO: Replace with actual authentication logic
-          // This is a mock implementation for development
-          await mockDelay(500);
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
 
-          if (email && password) {
-            const mockUser = createMockUser(email);
+          if (error) throw error;
+
+          if (data.user) {
+            // Fetch profile data
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", data.user.id)
+              .single();
+
+            const appUser: User = {
+              id: data.user.id,
+              email: data.user.email || "",
+              name:
+                profile?.full_name || data.user.email?.split("@")[0] || "User",
+              avatar: profile?.avatar_url || undefined,
+              role: "user",
+              permissions: ["read", "write"],
+              metadata: {
+                createdAt: data.user.created_at,
+              },
+            };
+
             set({
               isAuthenticated: true,
               isLoading: false,
-              user: mockUser,
+              user: appUser,
               error: null,
             });
-          } else {
-            throw new Error("Invalid credentials");
           }
         } catch (error) {
           const message =
@@ -58,8 +79,8 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true });
 
         try {
-          // TODO: Replace with actual logout logic
-          await mockDelay(200);
+          const { error } = await supabase.auth.signOut();
+          if (error) throw error;
 
           set({
             isAuthenticated: false,
@@ -75,19 +96,40 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       checkAuth: async () => {
-        const { user } = get();
-
         set({ isLoading: true });
 
         try {
-          // TODO: Replace with actual token validation
-          await mockDelay(300);
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
 
-          // If we have a persisted user, consider them authenticated
-          if (user) {
+          if (session?.user) {
+            // Fetch profile data
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single();
+
+            const appUser: User = {
+              id: session.user.id,
+              email: session.user.email || "",
+              name:
+                profile?.full_name ||
+                session.user.email?.split("@")[0] ||
+                "User",
+              avatar: profile?.avatar_url || undefined,
+              role: "user",
+              permissions: ["read", "write"],
+              metadata: {
+                createdAt: session.user.created_at,
+              },
+            };
+
             set({
               isAuthenticated: true,
               isLoading: false,
+              user: appUser,
               error: null,
             });
           } else {
@@ -115,8 +157,15 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
 
         try {
-          // Mock API call
-          await mockDelay(500);
+          const { error } = await supabase
+            .from("profiles")
+            .update({
+              full_name: data.name,
+              avatar_url: data.avatar,
+            })
+            .eq("id", user.id);
+
+          if (error) throw error;
 
           set({
             user: { ...user, ...data },
@@ -141,29 +190,53 @@ export const useAuthStore = create<AuthStore>()(
 );
 
 // ============================================================================
-// Helper Functions
+// Auth State Change Listener (for external subscription)
 // ============================================================================
 
-function mockDelay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export function subscribeToAuthChanges(
+  callback: (isAuthenticated: boolean, userId: string | null) => void
+) {
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN" && session?.user) {
+      callback(true, session.user.id);
+    } else if (event === "SIGNED_OUT") {
+      callback(false, null);
+    }
+  });
+
+  return () => subscription.unsubscribe();
 }
 
-function createMockUser(email: string): User {
-  const isAdmin = email.toLowerCase().includes("admin");
+// ============================================================================
+// Sign Up Function (used by Login page)
+// ============================================================================
 
-  return {
-    id: `user_${Date.now()}`,
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  fullName?: string
+): Promise<{ success: boolean; message: string }> {
+  const { data, error } = await supabase.auth.signUp({
     email,
-    name: email.split("@")[0],
-    role: isAdmin ? "admin" : "user",
-    permissions: isAdmin
-      ? ["admin", "read", "write", "delete"]
-      : ["read", "write"],
-    avatar: undefined,
-    metadata: {
-      createdAt: new Date().toISOString(),
+    password,
+    options: {
+      data: {
+        full_name: fullName || email.split("@")[0],
+      },
     },
-  };
+  });
+
+  if (error) {
+    return { success: false, message: error.message };
+  }
+
+  if (data.user?.identities?.length === 0) {
+    return { success: false, message: "Email already registered" };
+  }
+
+  return { success: true, message: "Account created! You can now sign in." };
 }
 
 // ============================================================================

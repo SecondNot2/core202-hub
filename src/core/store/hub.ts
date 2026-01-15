@@ -1,9 +1,11 @@
 /**
  * Hub Store - Global state management for the application shell
+ * Integrated with Supabase for cross-device sync
  */
 
 import { create } from "zustand";
 import { persist, subscribeWithSelector } from "zustand/middleware";
+import { supabase } from "@core/supabase/client";
 import type { HubState, HubActions, Notification } from "@shared/types";
 
 // ============================================================================
@@ -147,6 +149,97 @@ if (typeof window !== "undefined") {
         applyTheme("system");
       }
     });
+}
+
+// ============================================================================
+// Supabase Sync Functions
+// ============================================================================
+
+/**
+ * Load hub settings from Supabase for the given user
+ */
+export async function loadHubSettingsFromCloud(userId: string): Promise<void> {
+  try {
+    const { data, error } = await supabase
+      .from("hub_settings")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+
+    if (error && error.code !== "PGRST116") {
+      console.error("[Hub] Failed to load settings:", error);
+      return;
+    }
+
+    if (data) {
+      useHubStore.setState({
+        theme: (data.theme as "light" | "dark" | "system") || "system",
+        sidebarCollapsed: data.sidebar_collapsed ?? false,
+      });
+      applyTheme((data.theme as "light" | "dark" | "system") || "system");
+      console.log("[Hub] Loaded settings from cloud");
+    }
+  } catch (error) {
+    console.error("[Hub] Load settings failed:", error);
+  }
+}
+
+/**
+ * Save hub settings to Supabase for the given user
+ */
+export async function saveHubSettingsToCloud(userId: string): Promise<void> {
+  try {
+    const state = useHubStore.getState();
+
+    const { error } = await supabase.from("hub_settings").upsert({
+      user_id: userId,
+      theme: state.theme,
+      sidebar_collapsed: state.sidebarCollapsed,
+    });
+
+    if (error) throw error;
+    console.log("[Hub] Saved settings to cloud");
+  } catch (error) {
+    console.error("[Hub] Save settings failed:", error);
+  }
+}
+
+// ============================================================================
+// Auto-sync subscriber
+// ============================================================================
+
+let hubSettingsUnsubscribe: (() => void) | null = null;
+
+export function startHubSettingsSync(userId: string): void {
+  if (hubSettingsUnsubscribe) return; // Already started
+
+  // Load settings from cloud first
+  loadHubSettingsFromCloud(userId);
+
+  // Subscribe to local changes and sync to cloud
+  hubSettingsUnsubscribe = useHubStore.subscribe(
+    (state) => ({
+      theme: state.theme,
+      sidebarCollapsed: state.sidebarCollapsed,
+    }),
+    () => {
+      saveHubSettingsToCloud(userId);
+    },
+    {
+      equalityFn: (a, b) =>
+        a.theme === b.theme && a.sidebarCollapsed === b.sidebarCollapsed,
+    }
+  );
+
+  console.log("[Hub] Settings sync started");
+}
+
+export function stopHubSettingsSync(): void {
+  if (hubSettingsUnsubscribe) {
+    hubSettingsUnsubscribe();
+    hubSettingsUnsubscribe = null;
+    console.log("[Hub] Settings sync stopped");
+  }
 }
 
 // ============================================================================
