@@ -77,14 +77,14 @@ export const QuestList: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-800/30 backdrop-blur rounded-2xl border border-slate-700/50 p-5">
+    <div className="bg-white/80 dark:bg-slate-800/30 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-slate-700/50 p-5 shadow-sm transition-all duration-300">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <span className="text-2xl">📋</span> Today's Quests
           </h3>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
             {completedQuests.length} / {todayQuests.length} completed
           </p>
         </div>
@@ -99,7 +99,7 @@ export const QuestList: React.FC = () => {
               stroke="currentColor"
               strokeWidth="4"
               fill="none"
-              className="text-slate-700"
+              className="text-slate-200 dark:text-slate-700"
             />
             <circle
               cx="28"
@@ -112,7 +112,7 @@ export const QuestList: React.FC = () => {
               className="text-green-500"
             />
           </svg>
-          <div className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">
+          <div className="absolute inset-0 flex items-center justify-center text-slate-800 dark:text-white font-bold text-sm">
             {completionPercent}%
           </div>
         </div>
@@ -123,7 +123,7 @@ export const QuestList: React.FC = () => {
         {todayQuests.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-slate-500">No quests for today.</p>
-            <p className="text-slate-600 text-sm mt-1">
+            <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
               Add habits to generate daily quests!
             </p>
           </div>
@@ -142,7 +142,7 @@ export const QuestList: React.FC = () => {
 
             {/* Completed */}
             {completedQuests.length > 0 && (
-              <div className="pt-3 border-t border-slate-700/50">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-700/50">
                 <p className="text-sm text-slate-500 mb-2">Completed</p>
                 {completedQuests.map((quest) => (
                   <QuestCard
@@ -158,7 +158,7 @@ export const QuestList: React.FC = () => {
 
             {/* Skipped/Grace */}
             {otherQuests.length > 0 && (
-              <div className="pt-3 border-t border-slate-700/50">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-700/50">
                 <p className="text-sm text-slate-500 mb-2">Skipped / Grace</p>
                 {otherQuests.map((quest) => (
                   <QuestCard

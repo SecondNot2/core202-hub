@@ -63,15 +63,17 @@ export const SkillNode: React.FC<SkillNodeProps> = ({
         isUnlocked
           ? `bg-gradient-to-br ${colors.bg} ${colors.border} shadow-lg ${colors.glow}`
           : isAvailable && !isWeekLocked
-          ? `bg-slate-800/80 ${colors.border} border-dashed hover:border-solid cursor-pointer hover:scale-105`
-          : "bg-slate-900/50 border-slate-700 opacity-50"
+          ? `bg-white dark:bg-slate-800/80 ${colors.border} border-dashed hover:border-solid cursor-pointer hover:scale-105 shadow-sm`
+          : "bg-slate-100 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 opacity-60"
       }`}
       onClick={() => canUnlock && onUnlock(node.id)}
     >
       {/* Tier Badge */}
       <div
         className={`absolute -top-2 -right-2 text-xs px-2 py-0.5 rounded-full ${
-          isUnlocked ? "bg-white/20 text-white" : "bg-slate-700 text-slate-400"
+          isUnlocked
+            ? "bg-white/20 text-white"
+            : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
         }`}
       >
         {tierIcons[node.tier]}
@@ -79,24 +81,38 @@ export const SkillNode: React.FC<SkillNodeProps> = ({
 
       {/* Lock Icon */}
       {isWeekLocked && (
-        <div className="absolute -top-2 -left-2 bg-slate-700 text-slate-400 text-xs px-2 py-0.5 rounded-full">
+        <div className="absolute -top-2 -left-2 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs px-2 py-0.5 rounded-full">
           🔒 W{node.weekUnlock}
         </div>
       )}
 
       {/* Content */}
       <div className="space-y-2">
-        <h4 className={`font-bold ${isUnlocked ? "text-white" : colors.text}`}>
+        <h4
+          className={`font-bold ${
+            isUnlocked
+              ? "text-white"
+              : isAvailable && !isWeekLocked
+              ? "text-slate-900 dark:text-white"
+              : "text-slate-500 dark:text-slate-500"
+          }`}
+        >
           {node.name}
         </h4>
-        <p className="text-sm text-slate-300/80">{node.description}</p>
+        <p
+          className={`text-sm ${
+            isUnlocked ? "text-white/80" : "text-slate-500 dark:text-slate-400"
+          }`}
+        >
+          {node.description}
+        </p>
 
         {/* Effect */}
         <div
           className={`text-xs px-2 py-1 rounded ${
             isUnlocked
               ? "bg-white/10 text-white"
-              : "bg-slate-800 text-slate-400"
+              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
           }`}
         >
           {node.effect}
@@ -106,11 +122,19 @@ export const SkillNode: React.FC<SkillNodeProps> = ({
         {!isUnlocked && (
           <div
             className={`flex items-center justify-between text-sm mt-2 pt-2 border-t ${
-              isWeekLocked ? "border-slate-700" : colors.border + "/30"
+              isWeekLocked
+                ? "border-slate-200 dark:border-slate-700"
+                : "border-slate-200 dark:border-slate-700"
             }`}
           >
-            <span className="text-slate-400">Cost:</span>
-            <span className={canAfford ? "text-purple-400" : "text-red-400"}>
+            <span className="text-slate-500 dark:text-slate-400">Cost:</span>
+            <span
+              className={
+                canAfford
+                  ? "text-purple-600 dark:text-purple-400"
+                  : "text-red-500 dark:text-red-400"
+              }
+            >
               💎 {node.cost}
             </span>
           </div>

@@ -32,7 +32,7 @@ export const BossCard: React.FC<BossCardProps> = ({
   ] || { bg: "from-slate-600 to-gray-700", icon: "👹" };
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur rounded-2xl border border-slate-700 overflow-hidden">
+    <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm transition-all duration-300">
       {/* Boss Header */}
       <div className={`bg-gradient-to-r ${bossStyle.bg} p-6`}>
         <div className="flex items-center gap-4">
@@ -54,12 +54,18 @@ export const BossCard: React.FC<BossCardProps> = ({
       {/* HP Bar */}
       <div className="p-6">
         <div className="flex justify-between mb-2">
-          <span className="text-slate-400">Health</span>
-          <span className={isLowHp ? "text-red-400" : "text-white"}>
+          <span className="text-slate-500 dark:text-slate-400">Health</span>
+          <span
+            className={
+              isLowHp
+                ? "text-red-500 dark:text-red-400"
+                : "text-slate-900 dark:text-white"
+            }
+          >
             {boss.currentHealth} / {boss.maxHealth}
           </span>
         </div>
-        <div className="h-4 bg-slate-700 rounded-full overflow-hidden">
+        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
               isLowHp
@@ -72,24 +78,28 @@ export const BossCard: React.FC<BossCardProps> = ({
 
         {/* Weekly Stats */}
         <div className="grid grid-cols-2 gap-4 mt-6">
-          <div className="bg-slate-900/50 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-purple-400">
+          <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               {weeklyDamage}
             </div>
-            <div className="text-sm text-slate-400">Damage Dealt</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">
+              Damage Dealt
+            </div>
           </div>
-          <div className="bg-slate-900/50 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-green-400">
+          <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               {weeklyQuests}
             </div>
-            <div className="text-sm text-slate-400">Quests Completed</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">
+              Quests Completed
+            </div>
           </div>
         </div>
 
         {/* Weakness Hint */}
         {boss.weakness && (
-          <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-            <span className="text-amber-300 text-sm">
+          <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg">
+            <span className="text-amber-700 dark:text-amber-300 text-sm">
               💡 Weakness:{" "}
               <strong className="capitalize">{boss.weakness}</strong> quests
               deal bonus damage!
@@ -99,15 +109,21 @@ export const BossCard: React.FC<BossCardProps> = ({
       </div>
 
       {/* Rewards Preview */}
-      <div className="border-t border-slate-700 p-4 bg-slate-900/30">
-        <div className="text-sm text-slate-400 mb-2">Defeat Rewards</div>
+      <div className="border-t border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-900/30">
+        <div className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+          Defeat Rewards
+        </div>
         <div className="flex gap-4">
-          <span className="text-yellow-400">💰 {boss.rewards.gold} Gold</span>
-          <span className="text-purple-400">
+          <span className="text-yellow-600 dark:text-yellow-400">
+            💰 {boss.rewards.gold} Gold
+          </span>
+          <span className="text-purple-600 dark:text-purple-400">
             💎 {boss.rewards.shards} Shards
           </span>
           {boss.rewards.relicId && (
-            <span className="text-emerald-400">🏆 Relic</span>
+            <span className="text-emerald-600 dark:text-emerald-400">
+              🏆 Relic
+            </span>
           )}
         </div>
       </div>

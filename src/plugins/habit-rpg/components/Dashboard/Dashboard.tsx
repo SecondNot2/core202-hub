@@ -91,15 +91,15 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/30 to-slate-950 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-100 dark:from-slate-950 dark:via-purple-950/30 dark:to-slate-950 p-4 md:p-6 transition-colors duration-300">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <span className="text-3xl">🎮</span> Gamified Habits
             </h1>
-            <p className="text-slate-400 mt-1">
+            <p className="text-slate-500 dark:text-slate-400 mt-1">
               Week {season.currentWeek} • Season {season.seasonNumber}
             </p>
           </div>
@@ -153,12 +153,12 @@ export const Dashboard: React.FC = () => {
           {/* Sidebar */}
           <div className="space-y-4">
             {/* Habit List Management */}
-            <div className="bg-slate-800/30 backdrop-blur rounded-xl border border-slate-700/50 p-4">
+            <div className="bg-white/80 dark:bg-slate-800/30 backdrop-blur-md rounded-xl border border-slate-200 dark:border-slate-700/50 p-4 shadow-sm transition-all duration-300">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <span>📝</span> Your Habits
                 </h3>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-500 dark:text-slate-500">
                   {habits.filter((h) => h.isActive).length} active
                 </span>
               </div>
@@ -168,7 +168,7 @@ export const Dashboard: React.FC = () => {
                   No habits yet.{" "}
                   <button
                     onClick={handleAddHabit}
-                    className="text-purple-400 hover:text-purple-300"
+                    className="text-purple-600 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 font-medium"
                   >
                     Create one!
                   </button>
@@ -182,8 +182,8 @@ export const Dashboard: React.FC = () => {
                         flex items-center justify-between p-3 rounded-lg transition-all
                         ${
                           habit.isActive
-                            ? "bg-slate-700/30"
-                            : "bg-slate-700/10 opacity-60"
+                            ? "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/30 dark:hover:bg-slate-700/50"
+                            : "bg-slate-100/50 dark:bg-slate-700/10 opacity-60"
                         }
                       `}
                     >
@@ -192,8 +192,8 @@ export const Dashboard: React.FC = () => {
                           <span
                             className={`text-sm font-medium truncate ${
                               habit.isActive
-                                ? "text-white"
-                                : "text-slate-400 line-through"
+                                ? "text-slate-800 dark:text-white"
+                                : "text-slate-500 dark:text-slate-400 line-through"
                             }`}
                           >
                             {habit.title}
@@ -294,16 +294,18 @@ interface StatCardProps {
 }
 
 const StatCard: React.FC<StatCardProps> = ({ icon, label, value, color }) => (
-  <div className="bg-slate-800/30 backdrop-blur rounded-xl border border-slate-700/50 p-3">
+  <div className="bg-white/80 dark:bg-slate-800/30 backdrop-blur-md rounded-xl border border-slate-200 dark:border-slate-700/50 p-3 shadow-sm transition-all duration-300">
     <div className="flex items-center gap-3">
       <div
-        className={`w-10 h-10 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center text-lg shadow-lg`}
+        className={`w-10 h-10 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center text-lg shadow-lg text-white`}
       >
         {icon}
       </div>
       <div>
-        <p className="text-xs text-slate-400">{label}</p>
-        <p className="text-lg font-bold text-white">{value}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+        <p className="text-lg font-bold text-slate-900 dark:text-white">
+          {value}
+        </p>
       </div>
     </div>
   </div>
@@ -318,7 +320,7 @@ interface QuickLinkProps {
 const QuickLink: React.FC<QuickLinkProps> = ({ to, icon, label }) => (
   <Link
     to={to}
-    className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 hover:text-white transition-all text-sm"
+    className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/30 dark:hover:bg-slate-700/50 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all text-sm"
   >
     <span>{icon}</span>
     <span>{label}</span>

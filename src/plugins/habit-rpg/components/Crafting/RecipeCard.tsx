@@ -30,12 +30,12 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
 
   return (
     <div
-      className={`rounded-xl border p-4 transition-all ${
+      className={`rounded-xl border p-4 transition-all shadow-sm ${
         isLocked
-          ? "bg-slate-900/50 border-slate-700 opacity-50"
+          ? "bg-slate-100 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 opacity-60"
           : canAfford
-          ? "bg-slate-800/80 border-slate-600 hover:border-purple-500/50 cursor-pointer"
-          : "bg-slate-900/30 border-slate-700"
+          ? "bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-600 hover:border-purple-500 cursor-pointer shadow-md hover:shadow-lg"
+          : "bg-slate-50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-700"
       }`}
       onClick={() => !isDisabled && onCraft(recipe.id)}
     >
@@ -45,11 +45,15 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
 
         {/* Info */}
         <div className="flex-1">
-          <h4 className="font-bold text-white">{recipe.name}</h4>
-          <p className="text-sm text-slate-400 mb-2">{recipe.description}</p>
+          <h4 className="font-bold text-slate-900 dark:text-white">
+            {recipe.name}
+          </h4>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+            {recipe.description}
+          </p>
 
           {/* Effect */}
-          <div className="text-xs px-2 py-1 bg-slate-900/50 rounded inline-block text-green-400">
+          <div className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-900/50 rounded inline-block text-emerald-600 dark:text-green-400 font-medium">
             {recipe.effect}
           </div>
         </div>
@@ -58,7 +62,9 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
         <div className="text-right">
           <div
             className={`text-lg font-bold mb-2 ${
-              canAfford ? "text-yellow-400" : "text-red-400"
+              canAfford
+                ? "text-yellow-600 dark:text-yellow-400"
+                : "text-red-500 dark:text-red-400"
             }`}
           >
             💰 {recipe.goldCost}
@@ -68,15 +74,17 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
               disabled={!canAfford}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 canAfford
-                  ? "bg-purple-600 hover:bg-purple-500 text-white"
-                  : "bg-slate-700 text-slate-500 cursor-not-allowed"
+                  ? "bg-purple-600 hover:bg-purple-500 text-white shadow-sm"
+                  : "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed"
               }`}
             >
               Craft
             </button>
           )}
           {isLocked && (
-            <span className="text-xs text-slate-500">🔒 Locked</span>
+            <span className="text-xs text-slate-500 dark:text-slate-500">
+              🔒 Locked
+            </span>
           )}
         </div>
       </div>

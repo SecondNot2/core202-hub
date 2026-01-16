@@ -219,7 +219,8 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
   // Render: Main Widget
   // ============================================================================
   const calendarTheme = {
-    dark: ["#1e293b", "#064e3b", "#047857", "#10b981", "#34d399"],
+    light: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
+    dark: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
   };
 
   // Generate calendar data - uses full year data if available from contributions API
@@ -262,13 +263,13 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
 
   return (
     <div
-      className={`bg-slate-800/30 backdrop-blur rounded-xl border border-slate-700/50 overflow-hidden ${className}`}
+      className={`bg-white/80 dark:bg-slate-800/30 backdrop-blur-md rounded-xl border border-slate-200 dark:border-slate-700/50 overflow-hidden shadow-sm transition-all duration-300 ${className}`}
     >
       {/* Header */}
-      <div className="p-4 border-b border-slate-700/50">
+      <div className="p-4 border-b border-slate-200 dark:border-slate-700/50">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <GitHubIcon className="text-emerald-400" />
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <GitHubIcon className="text-emerald-500 dark:text-emerald-400" />
             GitHub Activity
           </h3>
           <div className="flex items-center gap-3">
@@ -276,7 +277,7 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
               href={`https://github.com/${github.username}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+              className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-400 dark:hover:text-emerald-300 transition-colors"
             >
               {stats?.profile?.avatar_url && (
                 <img
@@ -290,7 +291,7 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all disabled:opacity-50"
+              className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg transition-all disabled:opacity-50"
               title="Refresh"
             >
               <RefreshIcon className={isRefreshing ? "animate-spin" : ""} />
@@ -298,7 +299,7 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
           </div>
         </div>
         {stats?.lastFetched && (
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
             Updated {formatLastUpdated(stats.lastFetched)}
           </p>
         )}
@@ -307,8 +308,8 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
       <div className="p-4 space-y-4">
         {/* Quest Completion Banner */}
         {stats && stats.todayCommits > 0 && (
-          <div className="p-3 bg-emerald-900/30 rounded-lg border border-emerald-700/50 animate-fade-in">
-            <div className="flex items-center gap-2 text-emerald-400">
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg border border-emerald-200 dark:border-emerald-700/50 animate-fade-in">
+            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
               <CheckIcon />
               <span className="text-sm font-medium">
                 Daily Commit Quest Completed! +25 XP, +10 Gold
@@ -352,16 +353,16 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
 
         {/* Activity Calendar */}
         {stats && stats.activities && stats.activities.length > 0 && (
-          <div className="bg-slate-900/50 rounded-lg p-3 overflow-x-auto">
+          <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3 overflow-x-auto border border-slate-100 dark:border-slate-800 transition-colors duration-300">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-medium text-slate-300">
+              <h4 className="text-sm font-medium text-slate-600 dark:text-slate-300">
                 {totalContributions} contributions in {new Date().getFullYear()}
               </h4>
             </div>
             <ActivityCalendar
               data={generateCalendarData()}
               theme={calendarTheme}
-              colorScheme="dark"
+              colorScheme="light" // Using light/dark adaptive if supported, or fix to specific loop
               blockSize={11}
               blockRadius={2}
               blockMargin={3}
@@ -385,15 +386,17 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
 
         {/* Commit Patterns */}
         {stats?.patterns && (
-          <div className="bg-slate-900/50 rounded-lg p-3">
-            <h4 className="text-xs font-medium text-slate-400 mb-3 flex items-center gap-1">
+          <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3 border border-slate-100 dark:border-slate-800 transition-colors duration-300">
+            <h4 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1">
               📊 Commit Patterns
             </h4>
             <div className="grid grid-cols-2 gap-3">
               {/* Most Active Hour */}
-              <div className="bg-slate-800/50 rounded-lg p-2.5">
-                <p className="text-xs text-slate-500 mb-1">Most Active Hour</p>
-                <p className="text-lg font-bold text-white">
+              <div className="bg-white dark:bg-slate-800/50 rounded-lg p-2.5 border border-slate-100 dark:border-transparent">
+                <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">
+                  Most Active Hour
+                </p>
+                <p className="text-lg font-bold text-slate-700 dark:text-white">
                   {stats.patterns.mostActiveHour}:00
                 </p>
                 <div className="flex gap-0.5 mt-2 h-6 items-end">
@@ -410,7 +413,7 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
                           className={`flex-1 rounded-sm transition-all ${
                             h.hour === stats.patterns!.mostActiveHour
                               ? "bg-emerald-400"
-                              : "bg-slate-600"
+                              : "bg-slate-200 dark:bg-slate-600"
                           }`}
                           style={{ height: `${Math.max(height, 8)}%` }}
                           title={`${h.hour}:00 - ${h.count} commits`}
@@ -421,9 +424,11 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
               </div>
 
               {/* Most Active Day */}
-              <div className="bg-slate-800/50 rounded-lg p-2.5">
-                <p className="text-xs text-slate-500 mb-1">Most Active Day</p>
-                <p className="text-lg font-bold text-white">
+              <div className="bg-white dark:bg-slate-800/50 rounded-lg p-2.5 border border-slate-100 dark:border-transparent">
+                <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">
+                  Most Active Day
+                </p>
+                <p className="text-lg font-bold text-slate-700 dark:text-white">
                   {stats.patterns.mostActiveDay}
                 </p>
                 <div className="flex gap-1 mt-2">
@@ -438,7 +443,7 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
                         className={`flex-1 h-6 rounded-sm flex items-center justify-center text-[10px] font-medium transition-all ${
                           d.day === stats.patterns!.mostActiveDay
                             ? "bg-emerald-500 text-white"
-                            : "text-slate-400"
+                            : "text-slate-400 dark:text-slate-400"
                         }`}
                         style={{
                           backgroundColor:
@@ -448,6 +453,7 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
                         }}
                         title={`${d.day}: ${d.count} commits`}
                       >
+                        {/* Day Letter */}
                         {d.day.charAt(0)}
                       </div>
                     );
@@ -460,20 +466,22 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
 
         {/* Recent Commits */}
         {stats?.recentCommits && stats.recentCommits.length > 0 && (
-          <div className="bg-slate-900/50 rounded-lg p-3">
-            <h4 className="text-xs font-medium text-slate-400 mb-2 flex items-center gap-1">
+          <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3 border border-slate-100 dark:border-slate-800 transition-colors duration-300">
+            <h4 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1">
               💬 Recent Commits
             </h4>
             <div className="space-y-2">
               {stats.recentCommits.map((commit, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-2 text-xs p-2 rounded-lg bg-slate-800/30 hover:bg-slate-800/50 transition-colors"
+                  className="flex items-start gap-2 text-xs p-2 rounded-lg bg-white dark:bg-slate-800/30 border border-slate-100 dark:border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                 >
-                  <CommitIcon className="text-slate-500 mt-0.5 flex-shrink-0" />
+                  <CommitIcon className="text-slate-400 dark:text-slate-500 mt-0.5 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-slate-300 truncate">{commit.message}</p>
-                    <p className="text-slate-500 mt-0.5">
+                    <p className="text-slate-600 dark:text-slate-300 truncate">
+                      {commit.message}
+                    </p>
+                    <p className="text-slate-400 dark:text-slate-500 mt-0.5">
                       {commit.repo} · {formatRelativeTime(commit.date)}
                     </p>
                   </div>
@@ -488,7 +496,7 @@ export const GitHubWidget: React.FC<GitHubWidgetProps> = ({ className }) => {
       <div className="px-4 pb-3 flex justify-end">
         <button
           onClick={() => setGitHubUsername(null)}
-          className="text-xs text-slate-500 hover:text-slate-400 transition-colors"
+          className="text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-400 transition-colors"
         >
           Disconnect
         </button>
@@ -519,28 +527,32 @@ const StatCard: React.FC<StatCardProps> = ({
   highlight,
 }) => (
   <div
-    className={`p-3 rounded-lg bg-slate-900/50 border transition-all hover:scale-[1.02] ${
+    className={`p-3 rounded-lg bg-white dark:bg-slate-900/50 border transition-all hover:scale-[1.02] duration-300 ${
       highlight
         ? "border-emerald-500/50 shadow-lg shadow-emerald-500/10"
-        : "border-slate-700/50"
+        : "border-slate-200 dark:border-slate-700/50 shadow-sm"
     }`}
   >
     <div className="flex items-center gap-2 mb-1">
       <div
-        className={`w-7 h-7 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center text-sm shadow-lg`}
+        className={`w-7 h-7 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center text-sm shadow-lg text-white`}
       >
         {icon}
       </div>
-      <span className="text-xs text-slate-400">{label}</span>
+      <span className="text-xs text-slate-500 dark:text-slate-400">
+        {label}
+      </span>
     </div>
     <p
       className={`text-xl font-bold ${
-        highlight ? "text-emerald-400" : "text-white"
+        highlight
+          ? "text-emerald-500 dark:text-emerald-400"
+          : "text-slate-800 dark:text-white"
       }`}
     >
       {value.toLocaleString()}
     </p>
-    <p className="text-xs text-slate-500">{suffix}</p>
+    <p className="text-xs text-slate-400 dark:text-slate-500">{suffix}</p>
   </div>
 );
 

@@ -54,8 +54,8 @@ export const ArchetypeCard: React.FC<ArchetypeCardProps> = ({
         isSelected
           ? `bg-gradient-to-br ${style.gradient} ${style.border} shadow-xl scale-105`
           : isLocked
-          ? "bg-slate-900/50 border-slate-700 opacity-60 cursor-not-allowed"
-          : `bg-slate-800/80 ${style.border} border-opacity-30 hover:border-opacity-100 cursor-pointer hover:scale-102 ${style.glow} hover:shadow-xl`
+          ? "bg-slate-100 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed"
+          : `bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 ${style.border} border-opacity-30 hover:border-opacity-100 cursor-pointer hover:scale-102 ${style.glow} hover:shadow-xl`
       }`}
       onClick={() => !isLocked && !isSelected && onSelect(archetype.id)}
     >
@@ -76,14 +76,16 @@ export const ArchetypeCard: React.FC<ArchetypeCardProps> = ({
           <div>
             <h3
               className={`text-xl font-bold ${
-                isSelected ? "text-white" : "text-slate-200"
+                isSelected ? "text-white" : "text-slate-900 dark:text-slate-200"
               }`}
             >
               {archetype.name}
             </h3>
             <p
               className={`text-sm ${
-                isSelected ? "text-white/80" : "text-slate-400"
+                isSelected
+                  ? "text-white/80"
+                  : "text-slate-600 dark:text-slate-400"
               }`}
             >
               {archetype.description}
@@ -94,20 +96,22 @@ export const ArchetypeCard: React.FC<ArchetypeCardProps> = ({
         {/* Stats */}
         <div
           className={`grid grid-cols-2 gap-3 p-3 rounded-lg ${
-            isSelected ? "bg-white/10" : "bg-slate-900/50"
+            isSelected ? "bg-white/10" : "bg-slate-50 dark:bg-slate-900/50"
           }`}
         >
           <div>
             <div
               className={`text-xs ${
-                isSelected ? "text-white/60" : "text-slate-500"
+                isSelected
+                  ? "text-white/60"
+                  : "text-slate-500 dark:text-slate-500"
               }`}
             >
               Primary Stat
             </div>
             <div
               className={`font-bold ${
-                isSelected ? "text-white" : "text-slate-200"
+                isSelected ? "text-white" : "text-slate-800 dark:text-slate-200"
               }`}
             >
               {archetype.primaryStat} +20%
@@ -116,14 +120,16 @@ export const ArchetypeCard: React.FC<ArchetypeCardProps> = ({
           <div>
             <div
               className={`text-xs ${
-                isSelected ? "text-white/60" : "text-slate-500"
+                isSelected
+                  ? "text-white/60"
+                  : "text-slate-500 dark:text-slate-500"
               }`}
             >
               Secondary Stat
             </div>
             <div
               className={`font-bold ${
-                isSelected ? "text-white" : "text-slate-200"
+                isSelected ? "text-white" : "text-slate-800 dark:text-slate-200"
               }`}
             >
               {archetype.secondaryStat} +10%
@@ -136,10 +142,10 @@ export const ArchetypeCard: React.FC<ArchetypeCardProps> = ({
           className={`mt-3 text-center py-2 rounded-lg ${
             isSelected
               ? "bg-white/10 text-white"
-              : "bg-slate-900/50 text-slate-300"
+              : "bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300"
           }`}
         >
-          <span className="text-yellow-400">⭐</span> +
+          <span className="text-yellow-500 dark:text-yellow-400">⭐</span> +
           {Math.round((archetype.bonuses.xpMultiplier - 1) * 100)}% XP Bonus
         </div>
 

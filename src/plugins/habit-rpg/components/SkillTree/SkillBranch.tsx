@@ -68,7 +68,7 @@ export const SkillBranch: React.FC<SkillBranchProps> = ({
       </div>
 
       {/* Nodes */}
-      <div className="bg-slate-800/30 rounded-b-xl p-4 space-y-4 flex-1">
+      <div className="bg-slate-100 dark:bg-slate-800/30 rounded-b-xl p-4 space-y-4 flex-1 border-x border-b border-slate-200 dark:border-slate-700/50">
         {sortedNodes.map((node) => {
           const isUnlocked = unlockedIds.includes(node.id);
           const isWeekLocked = currentWeek < node.weekUnlock;

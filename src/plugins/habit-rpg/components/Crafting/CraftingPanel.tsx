@@ -53,36 +53,40 @@ export const CraftingPanel: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-amber-950/20 to-slate-950 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/20 to-slate-100 dark:from-slate-950 dark:via-amber-950/20 dark:to-slate-950 p-4 md:p-6 transition-colors duration-300">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <Link
               to="/rpg"
-              className="text-purple-400 hover:text-purple-300 text-sm mb-2 inline-block"
+              className="text-purple-600 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 text-sm mb-2 inline-block transition-colors"
             >
               ← Back to Dashboard
             </Link>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <span className="text-3xl">⚗️</span> Crafting
             </h1>
-            <p className="text-slate-400 mt-1">
+            <p className="text-slate-500 dark:text-slate-400 mt-1">
               Spend gold to craft useful items
             </p>
           </div>
 
           {/* Gold Display */}
-          <div className="bg-slate-800/50 backdrop-blur rounded-xl px-6 py-4 border border-slate-700">
-            <div className="text-sm text-slate-400">Available Gold</div>
-            <div className="text-3xl font-bold text-yellow-400">💰 {gold}</div>
+          <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-md rounded-xl px-6 py-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div className="text-sm text-slate-500 dark:text-slate-400">
+              Available Gold
+            </div>
+            <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+              💰 {gold}
+            </div>
           </div>
         </div>
 
         {/* Week Lock Warning */}
         {!isUnlocked && (
-          <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-            <span className="text-amber-300">
+          <div className="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg">
+            <span className="text-amber-700 dark:text-amber-300">
               🔒 Crafting unlocks in Week 6. You're currently in Week{" "}
               {currentWeek}.
             </span>
@@ -91,7 +95,9 @@ export const CraftingPanel: React.FC = () => {
 
         {/* Recipes */}
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-white">📜 Available Recipes</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            📜 Available Recipes
+          </h2>
           {CRAFTING_RECIPES.map((recipe) => (
             <RecipeCard
               key={recipe.id}
@@ -104,11 +110,11 @@ export const CraftingPanel: React.FC = () => {
         </div>
 
         {/* Info */}
-        <div className="bg-slate-800/30 rounded-xl border border-slate-700 p-4">
-          <h3 className="text-lg font-bold text-white mb-3">
+        <div className="bg-white/80 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">
             ℹ️ Crafting Tips
           </h3>
-          <ul className="text-slate-400 text-sm space-y-2">
+          <ul className="text-slate-500 dark:text-slate-400 text-sm space-y-2">
             <li>• Complete quests to earn gold</li>
             <li>• Grace tokens protect your streak when you miss quests</li>
             <li>• Energy potions let you complete more quests per day</li>
