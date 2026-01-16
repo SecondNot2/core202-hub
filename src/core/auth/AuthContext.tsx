@@ -5,6 +5,7 @@
 
 import React, { createContext, useContext, useEffect } from "react";
 import { useAuthStore, subscribeToAuthChanges } from "./store";
+import { supabase } from "@core/supabase/client";
 import { startHubSettingsSync, stopHubSettingsSync } from "@core/store/hub";
 import type { User, AuthState, AuthActions } from "@shared/types";
 
@@ -30,14 +31,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Check auth on mount and subscribe to Supabase auth changes
   useEffect(() => {
-    store.checkAuth();
+    // Get persisted state - if already authenticated, don't show loading
+    const persistedState = useAuthStore.getState();
+
+    // Only check auth if not already authenticated from persisted state
+    // This prevents "Checking authentication..." flash when switching tabs
+    if (!persistedState.isAuthenticated) {
+      store.checkAuth();
+    } else {
+      // Already authenticated from localStorage, just ensure isLoading is false
+      useAuthStore.setState({ isLoading: false });
+
+      // Silently verify session in background without showing loading
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          // Session expired, clear auth state
+          useAuthStore.setState({
+            isAuthenticated: false,
+            user: null,
+            isLoading: false,
+          });
+        }
+      });
+
+      // Start hub settings sync
+      if (persistedState.user?.id) {
+        startHubSettingsSync(persistedState.user.id);
+      }
+    }
 
     // Subscribe to auth state changes from Supabase
     const unsubscribe = subscribeToAuthChanges((isAuthenticated, userId) => {
       if (isAuthenticated && userId) {
-        // Re-check auth to refresh user data
-        store.checkAuth();
-        // Start hub settings sync
+        const current = useAuthStore.getState();
+
+        // Only run full checkAuth (which triggers loading screen) if:
+        // 1. We're not currently authenticated in our store
+        // 2. Or the user ID has changed (different user logged in)
+        if (!current.isAuthenticated || current.user?.id !== userId) {
+          store.checkAuth();
+        }
+
+        // Always ensure sync is running if we are authenticated
         startHubSettingsSync(userId);
       } else if (!isAuthenticated) {
         // Stop hub settings sync
@@ -50,12 +85,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         });
       }
     });
-
-    // If already authenticated on mount, start sync
-    const currentState = useAuthStore.getState();
-    if (currentState.isAuthenticated && currentState.user?.id) {
-      startHubSettingsSync(currentState.user.id);
-    }
 
     return () => {
       unsubscribe();

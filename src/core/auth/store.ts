@@ -199,11 +199,15 @@ export function subscribeToAuthChanges(
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((event, session) => {
+    // Only react to actual sign-in/sign-out events
+    // Ignore TOKEN_REFRESHED to prevent re-checking on tab focus
     if (event === "SIGNED_IN" && session?.user) {
       callback(true, session.user.id);
     } else if (event === "SIGNED_OUT") {
       callback(false, null);
     }
+    // Ignore: TOKEN_REFRESHED, USER_UPDATED, PASSWORD_RECOVERY, MFA_CHALLENGE_VERIFIED
+    // These don't require re-checking authentication state
   });
 
   return () => subscription.unsubscribe();
