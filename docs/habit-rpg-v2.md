@@ -40,3 +40,13 @@ The RPG system is decoupled from the UI to ensure deterministic game logic and e
 
 - **Gold Sink Economy**: Converts gold earned from habits into survival items.
 - **Survival Items**: Grace Tokens (streak shield), Energy Potions (+25 energy), and Morale Boosts (+15 morale).
+
+### 🎨 Theming System (Protocol 2)
+
+- **Responsive Palette**: Uses Tailwind's `dark:` variant and highly curated responsive gradients (`slate-50` light / `slate-950` dark).
+- **Glassmorphism Consistency**: Maintained readable "glass" effects (`bg-white/80` light / `bg-slate-800/30` dark) across all pages.
+
+### 🌐 External Integration
+
+- **GitHub Service**: Dedicated service layer to fetch and process GitHub contribution data.
+- **Real-time Analytics**: Tracks commit patterns (Active hours/days) to drive periodic game events.

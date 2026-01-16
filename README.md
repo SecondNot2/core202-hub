@@ -57,6 +57,8 @@ A deep RPG progression system designed for long-term habit formation.
 - **Economy**: Earn Gold, Essence Shards, and Relics to spend on skills and crafts.
 - **Boss System**: Weekly bosses generated based on your habit performance/weaknesses.
 - **Streak Protection**: Built-in grace tokens, streak shields, and recovery days.
+- **Responsive Theming**: Full support for both Premium Dark and Modern Light modes.
+- **GitHub Integration**: Real-time contribution tracking and commit pattern analytics.
 
 ## 🎨 UI/UX Features
 

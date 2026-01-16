@@ -22,6 +22,22 @@ When using AI tools like `replace_file_content` or `multi_replace_file_content` 
 - **Rule: Unique Target Selection.** Ensure the `TargetContent` is unique enough that the replacement doesn't accidentally shift code structure.
 - **Rule: Sequential Verification.** Run `npx tsc --noEmit` immediately after any multi-file refactoring or complex UI change to catch structural errors before they compound.
 
+## AI-Assisted UI Refactoring: The "Duplicate Return" Trap
+
+### Symptom
+
+- `ror TS1109: Expression expected` or `declaration or statement expected` pointing at a `return (` line.
+- The build fails but the code looks visually correct in the editor at first glance.
+
+### Root Cause
+
+When the AI attempts to replace a large component's JSX block, it sometimes mistakenly includes the `return (` line in the `ReplacementContent` while the `TargetContent` also starts at or after a `return (` line, leading to duplicate return statements.
+
+### Prevention Rule
+
+- **Rule: Multi-Line Wrapper Check.** Always check for duplicate keywords (`return`, `export`, `const`) if you see "Expression expected" errors after a large refactor.
+- **Rule: Smaller Replacement Chunks.** Break down large UI updates into smaller chunks rather than replacing the entire component's return statement.
+
 ---
 
 _Last updated: 2026-01-15_

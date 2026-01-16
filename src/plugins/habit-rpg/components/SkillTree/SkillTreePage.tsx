@@ -1,4 +1,3 @@
-4;
 /**
  * SkillTreePage - Skill tree page wrapper
  */
