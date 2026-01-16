@@ -179,7 +179,11 @@ function countCommitsForDate(
 ): number {
   return events
     .filter((event) => {
-      const eventDate = event.created_at.split("T")[0];
+      const date = new Date(event.created_at);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const eventDate = `${year}-${month}-${day}`;
       return event.type === "PushEvent" && eventDate === targetDate;
     })
     .reduce((total, event) => {
@@ -403,16 +407,25 @@ export async function getGitHubStats(
   };
 
   const today = getLocalDateString();
-  const todayCommits = countCommitsForDate(events, today);
+  const eventBasedCommits = countCommitsForDate(events, today);
   const { streak, lastCommitDate } = calculateStreak(events);
 
   // Use contribution data (full year) and merge with today's real-time data from events
   let activities: GitHubActivity[] =
     contributions.length > 0 ? [...contributions] : eventsToActivities(events);
 
+  // Find today's activity in contributions to get the baseline count
+  const todayActivityIndex = activities.findIndex((a) => a.date === today);
+  const contributionBasedCommits =
+    todayActivityIndex >= 0 ? activities[todayActivityIndex].count : 0;
+
+  // Use the maximum of event-based (real-time) and contribution-based (historic/comprehensive)
+  // This resolves issues where events API might miss private commits that the contribution graph includes
+  // or vice versa where events is faster than the contribution crawler
+  const todayCommits = Math.max(eventBasedCommits, contributionBasedCommits);
+
   // Merge today's commits from events API (more real-time) into contributions
   if (todayCommits > 0) {
-    const todayIndex = activities.findIndex((a) => a.date === today);
     const todayActivity = {
       date: today,
       count: todayCommits,
@@ -425,11 +438,9 @@ export async function getGitHubStats(
         : 1) as 0 | 1 | 2 | 3 | 4,
     };
 
-    if (todayIndex >= 0) {
-      // Update today's entry if events show more commits
-      if (todayCommits > activities[todayIndex].count) {
-        activities[todayIndex] = todayActivity;
-      }
+    if (todayActivityIndex >= 0) {
+      // Update today's entry with the max count
+      activities[todayActivityIndex] = todayActivity;
     } else {
       // Add today if not present
       activities.push(todayActivity);

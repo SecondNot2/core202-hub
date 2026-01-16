@@ -40,4 +40,23 @@ When the AI attempts to replace a large component's JSX block, it sometimes mist
 
 ---
 
-_Last updated: 2026-01-15_
+## Logic & State Management: The "Infinite Reward" Loop
+
+### Symptom
+
+- Stats (XP, Gold, Streaks) increase automatically every time the page is reloaded.
+- "Quest Completed" notifications appear repeatedly for the same task.
+
+### Root Cause
+
+- **Lack of Idempotency:** The reward logic (e.g., `gainXp`) is triggered by a UI component or ephemeral event (like `todayCommits > 0`) without checking a persistent "completed" flag (e.g., `lastClaimedDate`).
+- **UI vs Store Truth:** Relying on component state (`useState`) to track one-time events fails because component state resets on unmount/reload.
+
+### Prevention Rule
+
+- **Rule: Store-Level Idempotency.** Always implement a check (e.g., `if (lastClaimedDate === today) return`) inside the persistent store action (Zustand/Redux) before awarding resources. Never rely solely on the UI to gate rewards.
+- **Rule: Audit "Auto-Run" Logic.** If a function runs automatically on mount (useEffect), ensure it is side-effect free or strictly idempotent.
+
+---
+
+_Last updated: 2026-01-16_

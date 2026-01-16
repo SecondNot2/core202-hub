@@ -261,6 +261,7 @@ export interface GitHubConfig {
   enabled: boolean;
   minCommitsForQuest: number;
   bonusXpPerCommit: number;
+  lastQuestCompletedDate?: string;
 }
 
 // ============================================================================

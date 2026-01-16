@@ -123,6 +123,7 @@ const createInitialState = (): GameState => ({
     enabled: true,
     minCommitsForQuest: 1,
     bonusXpPerCommit: 5,
+    lastQuestCompletedDate: undefined,
   },
 });
 
@@ -627,9 +628,15 @@ export const useGameStore = create<GameStore>()(
 
       completeGitHubQuest: (commits) => {
         const state = get();
+        const today = getGameDate(
+          state.settings.timezone,
+          state.settings.dayBoundaryHour
+        );
+
         if (
           !state.github.enabled ||
-          commits < state.github.minCommitsForQuest
+          commits < state.github.minCommitsForQuest ||
+          state.github.lastQuestCompletedDate === today
         ) {
           return;
         }
@@ -652,6 +659,15 @@ export const useGameStore = create<GameStore>()(
         // Apply rewards
         get().gainXp(totalXp);
         get().earnGold(totalGold);
+
+        // Mark as completed for today
+        set((s) => ({
+          github: {
+            ...s.github,
+            lastQuestCompletedDate: today,
+          },
+        }));
+
         get().logEvent("github_quest_completed", {
           commits,
           xpEarned: totalXp,
