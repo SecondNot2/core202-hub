@@ -11,18 +11,18 @@ The RPG system is decoupled from the UI to ensure deterministic game logic and e
 
 ## Key Logic Decisions
 
-- **Deterministic Resets**: The scheduler calculates resets based on `lastLoginDate` and `currentDate` rather than simple timers, making it reliable across sessions.
+- **Level-Gated Progression**: Features unlock based on character level, rewarding active engagement rather than time waited.
 - **Effort-Based XP**: XP rewards use a logarithmic multiplier for effort minutes (`1 + ln(min/10) * 0.6`), ensuring longer tasks are rewarded fairly but not excessively.
-- **Stat Affinity**: Each habit aligns with a specific stat (e.g., Meditation -> WIS), driving character growth based on actual behavior.
+- **Attribute Affinity**: Each quest aligns with a specific attribute (e.g., Meditation -> WIS), driving character growth based on actual behavior.
 
 ## Advanced Subsystems
 
-### ⚡ Skill Tree (Discipline, Focus, Resilience)
+### ⚡ Talent Tree (Discipline, Focus, Resilience)
 
 - **Tiered Progress**: 18 unique nodes across 4 tiers.
-- **Week-Gated**: High-tier skills (T3, T4) are locked behind season progression (Weeks 6 and 9).
-- **Hard Prerequisites**: Skills require parent nodes to be unlocked first.
-- **Currency**: Uses **Essence Shards** (💎) earned exclusively from defeating bosses.
+- **Level-Gated**: High-tier talents are locked behind player level (Level 10 and 20).
+- **Hard Prerequisites**: Talents require parent nodes to be unlocked first.
+- **Currency**: Uses **Essence** (💎) earned exclusively from defeating bosses.
 
 ### ⚔️ Boss Encounter
 
@@ -30,15 +30,15 @@ The RPG system is decoupled from the UI to ensure deterministic game logic and e
 - **Damage Mechanics**: Passive damage dealt by completing daily quests. Quests matching the boss's **weakness** deal bonus damage.
 - **HP Scaling**: Boss health scales with player level and weekly performance.
 
-### 🎭 Archetypes & Stats
+### 🎭 Archetypes & Attributes
 
-- **Permanent Selection (Week 3)**: Choice of Builder, Scholar, Athlete, or Creator.
-- **Specialization**: Each archetype grants a primary (+20%) and secondary (+10%) growth bonus to corresponding stats.
-- **Unified Stat Block**: STR, INT, DEX, WIS, VIT directly influence game mechanics (e.g., higher VIT increases max energy).
+- **Permanent Selection (Level 10)**: Choice of Builder, Scholar, Athlete, or Creator.
+- **Specialization**: Each archetype grants a primary (+20%) and secondary (+10%) growth bonus to corresponding attributes.
+- **Unified Attribute Block**: STR, INT, DEX, WIS, VIT directly influence game mechanics.
 
-### ⚗️ Crafting (Week 6)
+### ⚗️ Crafting (Level 15)
 
-- **Gold Sink Economy**: Converts gold earned from habits into survival items.
+- **Gold Sink Economy**: Converts Gold earned from quests into survival items.
 - **Survival Items**: Grace Tokens (streak shield), Energy Potions (+25 energy), and Morale Boosts (+15 morale).
 
 ### 🎨 Theming System (Protocol 2)

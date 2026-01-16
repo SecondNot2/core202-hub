@@ -29,7 +29,7 @@ export const manifest: PluginManifest = {
     },
     {
       id: "rpg-skills",
-      label: "Skill Tree",
+      label: "Talent Tree",
       path: "/rpg/skills",
       icon: "zap",
     },

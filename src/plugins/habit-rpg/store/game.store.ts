@@ -25,6 +25,7 @@ import {
   MAX_ENERGY,
   MAX_MORALE,
   STREAK_SHIELD_INTERVAL,
+  getUnlockedFeaturesForLevel,
 } from "../domain/constants";
 import {
   calculateXpReward,
@@ -238,6 +239,7 @@ export const useGameStore = create<GameStore>()(
       gainXp: (amount) =>
         set((state) => {
           let { xp, xpToNextLevel, level, totalXpEarned } = state.character;
+          const previousLevel = level;
 
           xp += amount;
           totalXpEarned += amount;
@@ -252,6 +254,20 @@ export const useGameStore = create<GameStore>()(
             get().logEvent("level_up", { newLevel: level });
           }
 
+          // Check for new feature unlocks on level up
+          if (level > previousLevel) {
+            const previousFeatures = getUnlockedFeaturesForLevel(previousLevel);
+            const newFeatures = getUnlockedFeaturesForLevel(level);
+            const unlockedFeatures = newFeatures.filter(
+              (f) => !previousFeatures.includes(f)
+            );
+
+            // Log each new feature unlock
+            unlockedFeatures.forEach((feature) => {
+              get().logEvent("feature_unlocked", { feature, level });
+            });
+          }
+
           return {
             character: {
               ...state.character,
@@ -261,7 +277,7 @@ export const useGameStore = create<GameStore>()(
               totalXpEarned,
               // Full energy on level up
               energy:
-                level !== state.character.level
+                level !== previousLevel
                   ? state.character.maxEnergy
                   : state.character.energy,
             },

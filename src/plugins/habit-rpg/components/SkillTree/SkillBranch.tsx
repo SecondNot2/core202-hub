@@ -15,7 +15,7 @@ interface SkillBranchProps {
   icon: string;
   nodes: SkillNodeType[];
   unlockedIds: string[];
-  currentWeek: number;
+  playerLevel: number;
   currentShards: number;
   onUnlock: (nodeId: string) => void;
 }
@@ -26,7 +26,7 @@ export const SkillBranch: React.FC<SkillBranchProps> = ({
   icon,
   nodes,
   unlockedIds,
-  currentWeek,
+  playerLevel,
   currentShards,
   onUnlock,
 }) => {
@@ -71,9 +71,9 @@ export const SkillBranch: React.FC<SkillBranchProps> = ({
       <div className="bg-slate-100 dark:bg-slate-800/30 rounded-b-xl p-4 space-y-4 flex-1 border-x border-b border-slate-200 dark:border-slate-700/50">
         {sortedNodes.map((node) => {
           const isUnlocked = unlockedIds.includes(node.id);
-          const isWeekLocked = currentWeek < node.weekUnlock;
+          const isLevelLocked = playerLevel < node.levelUnlock;
           const prereqsMet = arePrerequisitesMet(node);
-          const isAvailable = !isUnlocked && prereqsMet;
+          const isAvailable = !isUnlocked && prereqsMet && !isLevelLocked;
 
           return (
             <SkillNode
@@ -81,7 +81,7 @@ export const SkillBranch: React.FC<SkillBranchProps> = ({
               node={node}
               isUnlocked={isUnlocked}
               isAvailable={isAvailable}
-              isWeekLocked={isWeekLocked}
+              isLevelLocked={isLevelLocked}
               currentShards={currentShards}
               onUnlock={onUnlock}
             />

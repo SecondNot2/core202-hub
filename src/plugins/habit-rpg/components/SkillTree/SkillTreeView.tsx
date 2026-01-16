@@ -10,7 +10,7 @@ import { SkillBranch } from "./SkillBranch";
 export const SkillTreeView: React.FC = () => {
   const unlockedIds = useGameStore((s) => s.skillTree.unlockedSkillIds);
   const currentShards = useGameStore((s) => s.inventory.essenceShards);
-  const currentWeek = useGameStore((s) => s.season.currentWeek);
+  const playerLevel = useGameStore((s) => s.character.level);
   const unlockSkill = useGameStore((s) => s.unlockSkill);
 
   // Group nodes by branch
@@ -41,7 +41,7 @@ export const SkillTreeView: React.FC = () => {
         icon="🏛️"
         nodes={disciplineNodes}
         unlockedIds={unlockedIds}
-        currentWeek={currentWeek}
+        playerLevel={playerLevel}
         currentShards={currentShards}
         onUnlock={handleUnlock}
       />
@@ -51,7 +51,7 @@ export const SkillTreeView: React.FC = () => {
         icon="🎯"
         nodes={focusNodes}
         unlockedIds={unlockedIds}
-        currentWeek={currentWeek}
+        playerLevel={playerLevel}
         currentShards={currentShards}
         onUnlock={handleUnlock}
       />
@@ -61,7 +61,7 @@ export const SkillTreeView: React.FC = () => {
         icon="🛡️"
         nodes={resilienceNodes}
         unlockedIds={unlockedIds}
-        currentWeek={currentWeek}
+        playerLevel={playerLevel}
         currentShards={currentShards}
         onUnlock={handleUnlock}
       />

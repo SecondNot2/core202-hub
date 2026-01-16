@@ -90,7 +90,7 @@ export const CRAFTING_RECIPES = [
     icon: "🎫",
     goldCost: 50,
     effect: "+1 Grace Token",
-    weekUnlock: 6,
+    levelUnlock: 10,
   },
   {
     id: "energy-potion",
@@ -99,7 +99,7 @@ export const CRAFTING_RECIPES = [
     icon: "⚡",
     goldCost: 30,
     effect: "+25 Energy",
-    weekUnlock: 6,
+    levelUnlock: 10,
   },
   {
     id: "morale-boost",
@@ -108,7 +108,7 @@ export const CRAFTING_RECIPES = [
     icon: "✨",
     goldCost: 40,
     effect: "+15 Morale",
-    weekUnlock: 6,
+    levelUnlock: 10,
   },
 ];
 
@@ -189,7 +189,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "+15% XP for morning window quests",
     cost: 5,
     prerequisiteIds: [],
-    weekUnlock: 1,
+    levelUnlock: 1,
   },
   {
     id: "disc-1-2",
@@ -200,7 +200,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "Grace tokens refresh +1 day earlier",
     cost: 5,
     prerequisiteIds: [],
-    weekUnlock: 1,
+    levelUnlock: 1,
   },
   {
     id: "disc-2-1",
@@ -211,7 +211,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "Streak shields every 10 days (was 14)",
     cost: 10,
     prerequisiteIds: ["disc-1-1", "disc-1-2"],
-    weekUnlock: 3,
+    levelUnlock: 8,
   },
   {
     id: "disc-2-2",
@@ -222,7 +222,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "Completing quest A suggests related quest B",
     cost: 10,
     prerequisiteIds: ["disc-1-2"],
-    weekUnlock: 3,
+    levelUnlock: 8,
   },
   {
     id: "disc-3-1",
@@ -233,7 +233,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "Morale decay -50%",
     cost: 15,
     prerequisiteIds: ["disc-2-1"],
-    weekUnlock: 6,
+    levelUnlock: 15,
   },
   {
     id: "disc-4-1",
@@ -244,7 +244,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "First miss each week costs no streak",
     cost: 25,
     prerequisiteIds: ["disc-3-1"],
-    weekUnlock: 9,
+    levelUnlock: 20,
   },
 
   // ===== Focus Branch =====
@@ -257,7 +257,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "+20% XP for 45+ min quests",
     cost: 5,
     prerequisiteIds: [],
-    weekUnlock: 1,
+    levelUnlock: 1,
   },
   {
     id: "focus-1-2",
@@ -268,7 +268,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "+10% Gold from project quests",
     cost: 5,
     prerequisiteIds: [],
-    weekUnlock: 1,
+    levelUnlock: 1,
   },
   {
     id: "focus-2-1",
@@ -279,7 +279,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "+15% XP when quest has proof",
     cost: 10,
     prerequisiteIds: ["focus-1-1"],
-    weekUnlock: 3,
+    levelUnlock: 8,
   },
   {
     id: "focus-2-2",
@@ -290,7 +290,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "Access to 45/60/90 min deep sessions",
     cost: 10,
     prerequisiteIds: ["focus-1-1", "focus-1-2"],
-    weekUnlock: 5,
+    levelUnlock: 12,
   },
   {
     id: "focus-3-1",
@@ -301,7 +301,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "-25% energy cost for long quests",
     cost: 15,
     prerequisiteIds: ["focus-2-1", "focus-2-2"],
-    weekUnlock: 6,
+    levelUnlock: 15,
   },
   {
     id: "focus-4-1",
@@ -312,7 +312,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "Double XP from first 90-min session daily",
     cost: 25,
     prerequisiteIds: ["focus-3-1"],
-    weekUnlock: 9,
+    levelUnlock: 20,
   },
 
   // ===== Resilience Branch =====
@@ -325,7 +325,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "+20% energy regen rate",
     cost: 5,
     prerequisiteIds: [],
-    weekUnlock: 1,
+    levelUnlock: 1,
   },
   {
     id: "resil-1-2",
@@ -336,7 +336,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "+1 max grace tokens",
     cost: 5,
     prerequisiteIds: [],
-    weekUnlock: 2,
+    levelUnlock: 3,
   },
   {
     id: "resil-2-1",
@@ -347,7 +347,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "Recovery days give +10 morale",
     cost: 10,
     prerequisiteIds: ["resil-1-1", "resil-1-2"],
-    weekUnlock: 3,
+    levelUnlock: 8,
   },
   {
     id: "resil-2-2",
@@ -358,7 +358,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "After streak break, start at streak 3",
     cost: 10,
     prerequisiteIds: ["resil-1-2"],
-    weekUnlock: 4,
+    levelUnlock: 10,
   },
   {
     id: "resil-3-1",
@@ -369,7 +369,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "Morale cannot drop below 20",
     cost: 15,
     prerequisiteIds: ["resil-2-1"],
-    weekUnlock: 6,
+    levelUnlock: 15,
   },
   {
     id: "resil-4-1",
@@ -380,7 +380,7 @@ export const SKILL_NODES: SkillNode[] = [
     effect: "Once per season: full streak restore",
     cost: 25,
     prerequisiteIds: ["resil-3-1"],
-    weekUnlock: 9,
+    levelUnlock: 20,
   },
 ];
 
@@ -420,20 +420,56 @@ export const WEEKLY_BOSS_TEMPLATES = [
 ];
 
 // ============================================================================
-// Week-Gated Features
+// Level-Gated Features (Replaces Week-Gated)
 // ============================================================================
 
-export const FEATURE_UNLOCKS: Record<number, string[]> = {
+/**
+ * Feature unlocks based on player level.
+ * Designed for a 90-day (3-month) season.
+ * - Month 1 (Lvl 1-8): Core systems unlock
+ * - Month 2 (Lvl 9-15): Advanced systems unlock
+ * - Month 3 (Lvl 16-20): Endgame content
+ */
+export const LEVEL_UNLOCKS: Record<number, string[]> = {
   1: ["daily_quests", "basic_habits", "xp_level"],
-  2: ["streak_system", "grace_tokens", "calendar"],
-  3: ["archetypes", "skill_tree_t2"],
-  4: ["weekly_boss", "items"],
-  5: ["project_quests", "deep_sessions"],
-  6: ["crafting", "skill_tree_t3"],
-  7: ["class_hybrid"],
-  8: ["monthly_raid", "relics"],
-  9: ["skill_tree_t4", "capstones"],
-  10: ["dynamic_difficulty"],
-  11: ["prestige_lite"],
-  12: ["season_finale"],
+  3: ["streak_system", "grace_tokens", "calendar"],
+  5: ["archetypes"],
+  8: ["weekly_boss", "talent_tree_t2"],
+  10: ["crafting", "items"],
+  12: ["project_quests", "deep_sessions"],
+  15: ["talent_tree_t3", "monthly_raid"],
+  18: ["class_hybrid", "relics"],
+  20: ["talent_tree_t4", "capstones", "dynamic_difficulty"],
 };
+
+/**
+ * Helper to get all unlocked features for a given level.
+ */
+export function getUnlockedFeaturesForLevel(level: number): string[] {
+  const features: string[] = [];
+  for (const [lvl, feats] of Object.entries(LEVEL_UNLOCKS)) {
+    if (Number(lvl) <= level) {
+      features.push(...feats);
+    }
+  }
+  return features;
+}
+
+/**
+ * Check if a specific feature is unlocked at a given level.
+ */
+export function isFeatureUnlocked(feature: string, level: number): boolean {
+  return getUnlockedFeaturesForLevel(level).includes(feature);
+}
+
+/**
+ * Get the level required to unlock a specific feature.
+ */
+export function getLevelRequirement(feature: string): number | null {
+  for (const [lvl, feats] of Object.entries(LEVEL_UNLOCKS)) {
+    if (feats.includes(feature)) {
+      return Number(lvl);
+    }
+  }
+  return null;
+}

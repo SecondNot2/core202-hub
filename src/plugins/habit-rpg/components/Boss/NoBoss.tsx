@@ -5,12 +5,12 @@
 import React from "react";
 
 interface NoBossProps {
-  currentWeek: number;
+  playerLevel: number;
 }
 
-export const NoBoss: React.FC<NoBossProps> = ({ currentWeek }) => {
-  const bossUnlockWeek = 4;
-  const isLocked = currentWeek < bossUnlockWeek;
+export const NoBoss: React.FC<NoBossProps> = ({ playerLevel }) => {
+  const bossUnlockLevel = 8;
+  const isLocked = playerLevel < bossUnlockLevel;
 
   return (
     <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-slate-700 p-12 text-center shadow-sm transition-all duration-300">
@@ -20,7 +20,7 @@ export const NoBoss: React.FC<NoBossProps> = ({ currentWeek }) => {
       </h3>
       <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
         {isLocked
-          ? `Weekly bosses unlock in Week ${bossUnlockWeek}. Keep completing quests to progress! You're currently in Week ${currentWeek}.`
+          ? `Boss encounters unlock at Level ${bossUnlockLevel}. Keep completing quests to level up! You're currently Level ${playerLevel}.`
           : "A new boss will spawn at the start of next week. Complete your quests to prepare!"}
       </p>
 

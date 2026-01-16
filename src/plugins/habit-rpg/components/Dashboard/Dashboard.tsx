@@ -100,7 +100,7 @@ export const Dashboard: React.FC = () => {
               <span className="text-3xl">🎮</span> Gamified Habits
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-1">
-              Week {season.currentWeek} • Season {season.seasonNumber}
+              Level {character.level} • Season {season.seasonNumber}
             </p>
           </div>
 
@@ -263,7 +263,7 @@ export const Dashboard: React.FC = () => {
               </h3>
               <div className="grid grid-cols-2 gap-2">
                 <QuickLink to="/rpg/character" icon="👤" label="Character" />
-                <QuickLink to="/rpg/skills" icon="✨" label="Skill Tree" />
+                <QuickLink to="/rpg/skills" icon="✨" label="Talent Tree" />
                 <QuickLink to="/rpg/boss" icon="👹" label="Boss" />
                 <QuickLink to="/rpg/crafting" icon="⚗️" label="Crafting" />
               </div>

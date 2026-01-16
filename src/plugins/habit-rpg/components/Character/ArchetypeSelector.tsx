@@ -10,10 +10,10 @@ import type { ArchetypeId } from "../../domain/types";
 
 export const ArchetypeSelector: React.FC = () => {
   const currentArchetype = useGameStore((s) => s.character.archetypeId);
-  const currentWeek = useGameStore((s) => s.season.currentWeek);
+  const playerLevel = useGameStore((s) => s.character.level);
   const setArchetype = useGameStore((s) => s.setArchetype);
 
-  const isUnlocked = currentWeek >= 3;
+  const isUnlocked = playerLevel >= 5;
   const archetypes = Object.values(ARCHETYPES);
 
   const handleSelect = (id: string) => {
@@ -26,12 +26,12 @@ export const ArchetypeSelector: React.FC = () => {
 
   return (
     <div>
-      {/* Week Lock Warning */}
+      {/* Level Lock Warning */}
       {!isUnlocked && (
         <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
           <span className="text-amber-300">
-            🔒 Archetypes unlock in Week 3. You're currently in Week{" "}
-            {currentWeek}.
+            🔒 Archetypes unlock at Level 5. You're currently Level{" "}
+            {playerLevel}.
           </span>
         </div>
       )}

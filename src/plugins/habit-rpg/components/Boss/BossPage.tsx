@@ -10,7 +10,7 @@ import { NoBoss } from "./NoBoss";
 
 export const BossPage: React.FC = () => {
   const boss = useGameStore((s) => s.boss);
-  const season = useGameStore((s) => s.season);
+  const character = useGameStore((s) => s.character);
   const inventory = useGameStore((s) => s.inventory);
 
   const defeatedCount = boss.defeatedBossIds.length;
@@ -31,7 +31,7 @@ export const BossPage: React.FC = () => {
               <span className="text-3xl">⚔️</span> Boss Encounter
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-1">
-              Complete quests to deal damage to the weekly boss
+              Complete quests to deal damage to the boss
             </p>
           </div>
 
@@ -64,7 +64,7 @@ export const BossPage: React.FC = () => {
             weeklyQuests={boss.weeklyQuestsCompleted}
           />
         ) : (
-          <NoBoss currentWeek={season.currentWeek} />
+          <NoBoss playerLevel={character.level} />
         )}
 
         {/* Defeated Boss History */}

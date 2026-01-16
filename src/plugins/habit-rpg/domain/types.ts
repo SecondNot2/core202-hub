@@ -161,7 +161,7 @@ export interface SkillNode {
   effect: string;
   cost: number; // Essence Shards
   prerequisiteIds: string[];
-  weekUnlock: number; // Week when this node becomes available
+  levelUnlock: number; // Level when this node becomes available
 }
 
 export interface SkillTreeState {
@@ -221,6 +221,7 @@ export type EventType =
   | "quest_skipped"
   | "grace_used"
   | "level_up"
+  | "feature_unlocked"
   | "boss_damaged"
   | "boss_defeated"
   | "skill_unlocked"

@@ -9,7 +9,7 @@ import {
   isNewWeek,
   getWeekNumber,
 } from "../domain/rules";
-import { GRACE_TOKENS_PER_WEEK, FEATURE_UNLOCKS } from "../domain/constants";
+import { GRACE_TOKENS_PER_WEEK } from "../domain/constants";
 import type { GameState, QuestInstance } from "../domain/types";
 
 // ============================================================================
@@ -27,6 +27,9 @@ export interface ResetResult {
 /**
  * Main scheduler function - checks and applies all resets
  * This is deterministic: same input always produces same output
+ *
+ * NOTE: Feature unlocks are now derived from character.level via getUnlockedFeaturesForLevel()
+ * and are no longer processed here.
  */
 export function processScheduledResets(
   state: GameState,
@@ -59,20 +62,13 @@ export function processScheduledResets(
     updates = { ...updates, ...weeklyUpdates };
   }
 
-  // Check for new week unlocks
+  // Update week number (for tracking purposes only, not for unlocks)
   const currentWeek = getWeekNumber(state.season.startDate, currentDate);
   if (currentWeek !== state.season.currentWeek) {
-    const newUnlocks = checkWeekUnlocks(
-      currentWeek,
-      state.season.unlockedFeatures
-    );
-    result.newFeatures = newUnlocks;
-
     updates.season = {
       ...state.season,
       ...(updates.season || {}),
       currentWeek,
-      unlockedFeatures: [...state.season.unlockedFeatures, ...newUnlocks],
     };
   }
 
@@ -182,26 +178,6 @@ function processWeeklyReset(
   };
 
   return updates;
-}
-
-// ============================================================================
-// Feature Unlocks
-// ============================================================================
-
-function checkWeekUnlocks(week: number, currentUnlocks: string[]): string[] {
-  const newUnlocks: string[] = [];
-
-  // Check all weeks up to current
-  for (let w = 1; w <= week; w++) {
-    const weekFeatures = FEATURE_UNLOCKS[w] || [];
-    for (const feature of weekFeatures) {
-      if (!currentUnlocks.includes(feature)) {
-        newUnlocks.push(feature);
-      }
-    }
-  }
-
-  return newUnlocks;
 }
 
 // ============================================================================

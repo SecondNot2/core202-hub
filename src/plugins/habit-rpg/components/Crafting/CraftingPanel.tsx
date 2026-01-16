@@ -10,13 +10,13 @@ import { RecipeCard } from "./RecipeCard";
 
 export const CraftingPanel: React.FC = () => {
   const gold = useGameStore((s) => s.inventory.gold);
-  const currentWeek = useGameStore((s) => s.season.currentWeek);
+  const playerLevel = useGameStore((s) => s.character.level);
   const spendGold = useGameStore((s) => s.spendGold);
   const restoreEnergy = useGameStore((s) => s.restoreEnergy);
   const adjustMorale = useGameStore((s) => s.adjustMorale);
 
-  // Crafting is unlocked at Week 6
-  const isUnlocked = currentWeek >= 6;
+  // Crafting is unlocked at Level 10
+  const isUnlocked = playerLevel >= 10;
 
   const handleCraft = (recipeId: string) => {
     const recipe = CRAFTING_RECIPES.find((r) => r.id === recipeId);
@@ -83,12 +83,12 @@ export const CraftingPanel: React.FC = () => {
           </div>
         </div>
 
-        {/* Week Lock Warning */}
+        {/* Level Lock Warning */}
         {!isUnlocked && (
           <div className="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg">
             <span className="text-amber-700 dark:text-amber-300">
-              🔒 Crafting unlocks in Week 6. You're currently in Week{" "}
-              {currentWeek}.
+              🔒 Crafting unlocks at Level 10. You're currently Level{" "}
+              {playerLevel}.
             </span>
           </div>
         )}

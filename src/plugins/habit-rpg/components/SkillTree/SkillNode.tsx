@@ -9,7 +9,7 @@ interface SkillNodeProps {
   node: SkillNodeType;
   isUnlocked: boolean;
   isAvailable: boolean;
-  isWeekLocked: boolean;
+  isLevelLocked: boolean;
   currentShards: number;
   onUnlock: (nodeId: string) => void;
 }
@@ -18,12 +18,12 @@ export const SkillNode: React.FC<SkillNodeProps> = ({
   node,
   isUnlocked,
   isAvailable,
-  isWeekLocked,
+  isLevelLocked,
   currentShards,
   onUnlock,
 }) => {
   const canAfford = currentShards >= node.cost;
-  const canUnlock = isAvailable && canAfford && !isWeekLocked;
+  const canUnlock = isAvailable && canAfford && !isLevelLocked;
 
   // Branch colors
   const branchColors = {
@@ -62,7 +62,7 @@ export const SkillNode: React.FC<SkillNodeProps> = ({
       className={`relative rounded-xl border-2 p-4 transition-all duration-300 ${
         isUnlocked
           ? `bg-gradient-to-br ${colors.bg} ${colors.border} shadow-lg ${colors.glow}`
-          : isAvailable && !isWeekLocked
+          : isAvailable && !isLevelLocked
           ? `bg-white dark:bg-slate-800/80 ${colors.border} border-dashed hover:border-solid cursor-pointer hover:scale-105 shadow-sm`
           : "bg-slate-100 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 opacity-60"
       }`}
@@ -80,9 +80,9 @@ export const SkillNode: React.FC<SkillNodeProps> = ({
       </div>
 
       {/* Lock Icon */}
-      {isWeekLocked && (
+      {isLevelLocked && (
         <div className="absolute -top-2 -left-2 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs px-2 py-0.5 rounded-full">
-          🔒 W{node.weekUnlock}
+          🔒 Lv.{node.levelUnlock}
         </div>
       )}
 
@@ -92,7 +92,7 @@ export const SkillNode: React.FC<SkillNodeProps> = ({
           className={`font-bold ${
             isUnlocked
               ? "text-white"
-              : isAvailable && !isWeekLocked
+              : isAvailable && !isLevelLocked
               ? "text-slate-900 dark:text-white"
               : "text-slate-500 dark:text-slate-500"
           }`}
@@ -122,7 +122,7 @@ export const SkillNode: React.FC<SkillNodeProps> = ({
         {!isUnlocked && (
           <div
             className={`flex items-center justify-between text-sm mt-2 pt-2 border-t ${
-              isWeekLocked
+              isLevelLocked
                 ? "border-slate-200 dark:border-slate-700"
                 : "border-slate-200 dark:border-slate-700"
             }`}
