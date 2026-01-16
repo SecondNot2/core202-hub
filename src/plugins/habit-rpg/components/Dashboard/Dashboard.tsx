@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { useGameStore } from "../../store";
 import { HeroPanel } from "../Character";
 import { QuestList, HabitFormModal } from "../Quests";
+import { GitHubWidget } from "./GitHubWidget";
 import { useConfirm, useToast } from "@shared/components";
 import type { Habit } from "../../domain/types";
 
@@ -251,6 +252,9 @@ export const Dashboard: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* GitHub Activity */}
+            <GitHubWidget />
 
             {/* Quick Links */}
             <div className="bg-slate-800/30 backdrop-blur rounded-xl border border-slate-700/50 p-4">

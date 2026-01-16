@@ -118,6 +118,12 @@ const createInitialState = (): GameState => ({
   events: [],
   snapshots: [],
   settings: createInitialSettings(),
+  github: {
+    username: null,
+    enabled: true,
+    minCommitsForQuest: 1,
+    bonusXpPerCommit: 5,
+  },
 });
 
 // ============================================================================
@@ -170,6 +176,11 @@ interface GameActions {
 
   // Events
   logEvent: (type: GameEvent["type"], data: Record<string, unknown>) => void;
+
+  // GitHub
+  setGitHubUsername: (username: string | null) => void;
+  setGitHubEnabled: (enabled: boolean) => void;
+  completeGitHubQuest: (commits: number) => void;
 
   // Helpers
   getXpParams: () => {
@@ -602,6 +613,51 @@ export const useGameStore = create<GameStore>()(
             },
           ],
         })),
+
+      // ===== GitHub =====
+      setGitHubUsername: (username) =>
+        set((state) => ({
+          github: { ...state.github, username },
+        })),
+
+      setGitHubEnabled: (enabled) =>
+        set((state) => ({
+          github: { ...state.github, enabled },
+        })),
+
+      completeGitHubQuest: (commits) => {
+        const state = get();
+        if (
+          !state.github.enabled ||
+          commits < state.github.minCommitsForQuest
+        ) {
+          return;
+        }
+
+        // Base reward
+        const baseXp = 25;
+        const baseGold = 10;
+
+        // Bonus for extra commits
+        const extraCommits = Math.max(
+          0,
+          commits - state.github.minCommitsForQuest
+        );
+        const bonusXp = extraCommits * state.github.bonusXpPerCommit;
+        const bonusGold = extraCommits * 2;
+
+        const totalXp = baseXp + bonusXp;
+        const totalGold = baseGold + bonusGold;
+
+        // Apply rewards
+        get().gainXp(totalXp);
+        get().earnGold(totalGold);
+        get().logEvent("github_quest_completed", {
+          commits,
+          xpEarned: totalXp,
+          goldEarned: totalGold,
+        });
+      },
 
       // ===== Helpers =====
       getXpParams: () => {

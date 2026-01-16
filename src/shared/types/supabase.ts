@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      github_activity_cache: {
+        Row: {
+          activity_data: Json | null;
+          current_streak: number | null;
+          github_username: string;
+          last_commit_date: string | null;
+          last_fetched: string | null;
+          today_commits: number | null;
+          updated_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          activity_data?: Json | null;
+          current_streak?: number | null;
+          github_username: string;
+          last_commit_date?: string | null;
+          last_fetched?: string | null;
+          today_commits?: number | null;
+          updated_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          activity_data?: Json | null;
+          current_streak?: number | null;
+          github_username?: string;
+          last_commit_date?: string | null;
+          last_fetched?: string | null;
+          today_commits?: number | null;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "github_activity_cache_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       hub_settings: {
         Row: {
           sidebar_collapsed: boolean | null;

@@ -227,7 +227,8 @@ export type EventType =
   | "item_purchased"
   | "item_crafted"
   | "streak_broken"
-  | "streak_milestone";
+  | "streak_milestone"
+  | "github_quest_completed";
 
 export interface GameEvent {
   id: string;
@@ -252,6 +253,17 @@ export interface DailySnapshot {
 }
 
 // ============================================================================
+// GitHub Integration
+// ============================================================================
+
+export interface GitHubConfig {
+  username: string | null;
+  enabled: boolean;
+  minCommitsForQuest: number;
+  bonusXpPerCommit: number;
+}
+
+// ============================================================================
 // Game State (Root)
 // ============================================================================
 
@@ -268,6 +280,7 @@ export interface GameState {
   events: GameEvent[];
   snapshots: DailySnapshot[];
   settings: GameSettings;
+  github: GitHubConfig;
 }
 
 export interface GameSettings {
