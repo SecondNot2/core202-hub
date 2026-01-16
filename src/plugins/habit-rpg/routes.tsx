@@ -8,6 +8,7 @@ import { SkillTreePage } from "./components/SkillTree";
 import { BossPage } from "./components/Boss";
 import { CharacterPage } from "./components/Character";
 import { CraftingPanel } from "./components/Crafting";
+import { GuidePage } from "./components/Guide";
 
 export const routes: RouteObject[] = [
   {
@@ -29,5 +30,9 @@ export const routes: RouteObject[] = [
   {
     path: "craft",
     element: <CraftingPanel />,
+  },
+  {
+    path: "guide",
+    element: <GuidePage />,
   },
 ];

@@ -6,7 +6,7 @@
 import React, { useEffect, useState } from "react";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { useGameStore } from "../../store";
+import { useGameStore, useSyncStore } from "../../store";
 import { HeroPanel } from "../Character";
 import { QuestList, HabitFormModal } from "../Quests";
 import { GitHubWidget } from "./GitHubWidget";
@@ -26,6 +26,9 @@ export const Dashboard: React.FC = () => {
 
   const { confirm } = useConfirm();
   const { toast } = useToast();
+
+  // Cloud sync hook - handles loading from and saving to Supabase
+  const { removeHabit: syncRemoveHabit } = useSyncStore();
 
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
@@ -78,6 +81,7 @@ export const Dashboard: React.FC = () => {
 
     if (confirmed) {
       deleteHabit(habit.id);
+      syncRemoveHabit(habit.id); // Sync to cloud
       toast.info(`"${habit.title}" has been deleted`);
     }
   };

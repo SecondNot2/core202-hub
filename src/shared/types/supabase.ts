@@ -7,6 +7,11 @@ export type Json =
   | Json[];
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.1";
+  };
   public: {
     Tables: {
       github_activity_cache: {
@@ -109,40 +114,52 @@ export type Database = {
       rpg_characters: {
         Row: {
           archetype_id: string | null;
+          avatar: string | null;
           energy: number | null;
+          hybrid_archetype_id: string | null;
           level: number | null;
           max_energy: number | null;
           morale: number | null;
-          name: string | null;
+          name: string;
           stats: Json | null;
+          total_xp_earned: number | null;
           updated_at: string | null;
           user_id: string;
+          week_number: number | null;
           xp: number | null;
           xp_to_next_level: number | null;
         };
         Insert: {
           archetype_id?: string | null;
+          avatar?: string | null;
           energy?: number | null;
+          hybrid_archetype_id?: string | null;
           level?: number | null;
           max_energy?: number | null;
           morale?: number | null;
-          name?: string | null;
+          name: string;
           stats?: Json | null;
+          total_xp_earned?: number | null;
           updated_at?: string | null;
           user_id: string;
+          week_number?: number | null;
           xp?: number | null;
           xp_to_next_level?: number | null;
         };
         Update: {
           archetype_id?: string | null;
+          avatar?: string | null;
           energy?: number | null;
+          hybrid_archetype_id?: string | null;
           level?: number | null;
           max_energy?: number | null;
           morale?: number | null;
-          name?: string | null;
+          name?: string;
           stats?: Json | null;
+          total_xp_earned?: number | null;
           updated_at?: string | null;
           user_id?: string;
+          week_number?: number | null;
           xp?: number | null;
           xp_to_next_level?: number | null;
         };
@@ -161,22 +178,22 @@ export type Database = {
           data: Json | null;
           id: string;
           timestamp: string | null;
-          type: string;
-          user_id: string;
+          type: string | null;
+          user_id: string | null;
         };
         Insert: {
           data?: Json | null;
           id?: string;
           timestamp?: string | null;
-          type: string;
-          user_id: string;
+          type?: string | null;
+          user_id?: string | null;
         };
         Update: {
           data?: Json | null;
           id?: string;
           timestamp?: string | null;
-          type?: string;
-          user_id?: string;
+          type?: string | null;
+          user_id?: string | null;
         };
         Relationships: [
           {
@@ -190,30 +207,33 @@ export type Database = {
       };
       rpg_general_state: {
         Row: {
-          boss_state: Json | null;
-          game_settings: Json | null;
+          boss: Json | null;
+          github: Json | null;
           inventory: Json | null;
-          season_state: Json | null;
+          season: Json | null;
+          settings: Json | null;
           skill_tree: Json | null;
           streak: Json | null;
           updated_at: string | null;
           user_id: string;
         };
         Insert: {
-          boss_state?: Json | null;
-          game_settings?: Json | null;
+          boss?: Json | null;
+          github?: Json | null;
           inventory?: Json | null;
-          season_state?: Json | null;
+          season?: Json | null;
+          settings?: Json | null;
           skill_tree?: Json | null;
           streak?: Json | null;
           updated_at?: string | null;
           user_id: string;
         };
         Update: {
-          boss_state?: Json | null;
-          game_settings?: Json | null;
+          boss?: Json | null;
+          github?: Json | null;
           inventory?: Json | null;
-          season_state?: Json | null;
+          season?: Json | null;
+          settings?: Json | null;
           skill_tree?: Json | null;
           streak?: Json | null;
           updated_at?: string | null;
@@ -231,46 +251,46 @@ export type Database = {
       };
       rpg_habits: {
         Row: {
-          category: string | null;
+          category: string;
           created_at: string | null;
           description: string | null;
-          difficulty: number | null;
-          effort_minutes: number | null;
+          difficulty: number;
+          effort_minutes: number;
           id: string;
           is_active: boolean | null;
-          proof_mode: string | null;
+          proof_mode: string;
           stat_affinity: string | null;
-          time_window: string | null;
+          time_window: string;
           title: string;
           updated_at: string | null;
           user_id: string;
         };
         Insert: {
-          category?: string | null;
+          category: string;
           created_at?: string | null;
           description?: string | null;
-          difficulty?: number | null;
-          effort_minutes?: number | null;
+          difficulty?: number;
+          effort_minutes: number;
           id?: string;
           is_active?: boolean | null;
-          proof_mode?: string | null;
+          proof_mode?: string;
           stat_affinity?: string | null;
-          time_window?: string | null;
+          time_window: string;
           title: string;
           updated_at?: string | null;
           user_id: string;
         };
         Update: {
-          category?: string | null;
+          category?: string;
           created_at?: string | null;
           description?: string | null;
-          difficulty?: number | null;
-          effort_minutes?: number | null;
+          difficulty?: number;
+          effort_minutes?: number;
           id?: string;
           is_active?: boolean | null;
-          proof_mode?: string | null;
+          proof_mode?: string;
           stat_affinity?: string | null;
-          time_window?: string | null;
+          time_window?: string;
           title?: string;
           updated_at?: string | null;
           user_id?: string;
@@ -290,57 +310,100 @@ export type Database = {
           completed_at: string | null;
           created_at: string | null;
           date: string;
-          difficulty: number | null;
-          effort_minutes: number | null;
-          gold_reward: number | null;
-          habit_id: string | null;
+          difficulty: number;
+          effort_minutes: number;
+          gold_reward: number;
+          habit_id: string;
           id: string;
           proof_content: string | null;
-          quest_type: string | null;
-          status: string | null;
+          quest_type: string;
+          status: string;
           user_id: string;
-          xp_reward: number | null;
+          xp_reward: number;
         };
         Insert: {
           completed_at?: string | null;
           created_at?: string | null;
           date: string;
-          difficulty?: number | null;
-          effort_minutes?: number | null;
-          gold_reward?: number | null;
-          habit_id?: string | null;
+          difficulty: number;
+          effort_minutes: number;
+          gold_reward: number;
+          habit_id: string;
           id?: string;
           proof_content?: string | null;
-          quest_type?: string | null;
-          status?: string | null;
+          quest_type: string;
+          status: string;
           user_id: string;
-          xp_reward?: number | null;
+          xp_reward: number;
         };
         Update: {
           completed_at?: string | null;
           created_at?: string | null;
           date?: string;
-          difficulty?: number | null;
-          effort_minutes?: number | null;
-          gold_reward?: number | null;
-          habit_id?: string | null;
+          difficulty?: number;
+          effort_minutes?: number;
+          gold_reward?: number;
+          habit_id?: string;
           id?: string;
           proof_content?: string | null;
-          quest_type?: string | null;
-          status?: string | null;
+          quest_type?: string;
+          status?: string;
           user_id?: string;
-          xp_reward?: number | null;
+          xp_reward?: number;
         };
         Relationships: [
           {
-            foreignKeyName: "rpg_quests_habit_id_fkey";
-            columns: ["habit_id"];
-            isOneToOne: false;
-            referencedRelation: "rpg_habits";
-            referencedColumns: ["id"];
-          },
-          {
             foreignKeyName: "rpg_quests_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      rpg_snapshots: {
+        Row: {
+          created_at: string | null;
+          date: string;
+          gold_earned: number | null;
+          id: string;
+          level: number | null;
+          quests_completed: number | null;
+          quests_total: number | null;
+          streak: number | null;
+          user_id: string | null;
+          xp: number | null;
+          xp_earned: number | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          date: string;
+          gold_earned?: number | null;
+          id?: string;
+          level?: number | null;
+          quests_completed?: number | null;
+          quests_total?: number | null;
+          streak?: number | null;
+          user_id?: string | null;
+          xp?: number | null;
+          xp_earned?: number | null;
+        };
+        Update: {
+          created_at?: string | null;
+          date?: string;
+          gold_earned?: number | null;
+          id?: string;
+          level?: number | null;
+          quests_completed?: number | null;
+          quests_total?: number | null;
+          streak?: number | null;
+          user_id?: string | null;
+          xp?: number | null;
+          xp_earned?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "rpg_snapshots_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
@@ -363,3 +426,113 @@ export type Database = {
     };
   };
 };
+
+type PublicSchema = Database[Extract<keyof Database, "public">];
+
+// Exclude internal Supabase metadata from schema lookups
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+
+export type Tables<
+  PublicTableNameOrOptions extends
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends PublicTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[PublicTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[PublicTableNameOrOptions["schema"]]["Views"])
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? (DatabaseWithoutInternals[PublicTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+      PublicSchema["Views"])
+  ? (PublicSchema["Tables"] &
+      PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : never;
+
+export type TablesInsert<
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends PublicTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+  ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : never;
+
+export type TablesUpdate<
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends PublicTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+  ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : never;
+
+export type Enums<
+  PublicEnumNameOrOptions extends
+    | keyof PublicSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends PublicEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicEnumNameOrOptions["schema"]]["Enums"]
+    : never = never
+> = PublicEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+  ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+  : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+  ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : never;

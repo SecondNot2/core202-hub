@@ -45,6 +45,12 @@ export const manifest: PluginManifest = {
       path: "/rpg/craft",
       icon: "flask-conical",
     },
+    {
+      id: "rpg-guide",
+      label: "Guide",
+      path: "/rpg/guide",
+      icon: "book-open",
+    },
   ],
 
   permissions: [],
