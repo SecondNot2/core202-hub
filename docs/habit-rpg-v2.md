@@ -50,3 +50,7 @@ The RPG system is decoupled from the UI to ensure deterministic game logic and e
 
 - **GitHub Service**: Dedicated service layer to fetch and process GitHub contribution data.
 - **Real-time Analytics**: Tracks commit patterns (Active hours/days) to drive periodic game events.
+- **Supabase Cloud Sync**: Hybrid persistence layer using an Offline-First approach.
+  - **Debounced Writes**: Character and state changes are buffered for 2 seconds before being sent to the cloud to minimize API cost.
+  - **State Merging**: During hydration, cloud data is prioritized while preserving local-only configuration.
+  - **Manual Fallback**: Support for `forceSync` to resolve cross-device drift.

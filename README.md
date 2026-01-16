@@ -58,6 +58,8 @@ A deep RPG progression system designed for long-term habit formation.
 - **Boss System**: Weekly bosses generated based on your habit performance/weaknesses.
 - **Streak Protection**: Built-in grace tokens, streak shields, and recovery days.
 - **Responsive Theming**: Full support for both Premium Dark and Modern Light modes.
+- **Cloud Synchronization**: Offline-first architecture with debounced auto-save to Supabase.
+- **Hero's Handbook**: In-app bilingual (VI/EN) documentation for game mechanics and stats.
 - **GitHub Integration**: Real-time contribution tracking and commit pattern analytics.
 
 ## 🎨 UI/UX Features

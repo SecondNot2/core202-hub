@@ -59,4 +59,26 @@ When the AI attempts to replace a large component's JSX block, it sometimes mist
 
 ---
 
+---
+
+## Infrastructure: Supabase Internal Type Conflicts
+
+### Symptom
+
+- TypeScript error: `Property '__InternalSupabase' is missing in type...` or `Type 'Database' is not assignable to...`
+- Auto-generated helper types like `Tables<...>` fail to resolve table names correctly.
+
+### Root Cause
+
+- The auto-generated `supabase.ts` occasionally includes a `__InternalSupabase` key at the root of the `Database` type. Generic utility types that iterate over `keyof Database` to find schemas/tables get confused by this metadata key.
+
+### Prevention Rule
+
+- **Rule: Database Wrapper.** Always create a `DatabaseWithoutInternals` type that omits metadata keys before passing the database type to generic helpers.
+- **Example Fix**:
+  ```typescript
+  type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+  export type Tables<T extends keyof DatabaseWithoutInternals['public']['Tables']> = ...
+  ```
+
 _Last updated: 2026-01-16_
