@@ -68,3 +68,6 @@ Desktop.ini
 # yarn.lock
 # pnpm-lock.yaml
 # .agent
+
+# RPG Assets (Source of truth: Supabase Storage)
+public/assets/rpg/items/

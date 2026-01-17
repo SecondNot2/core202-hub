@@ -61,12 +61,13 @@ A deep RPG progression system designed for long-term habit formation.
 - **Cloud Synchronization**: Offline-first architecture with debounced auto-save to Supabase.
 - **Hero's Handbook**: In-app bilingual (VI/EN) documentation for game mechanics and stats.
 - **GitHub Integration**: Real-time contribution tracking and commit pattern analytics.
+- **Headless Asset System**: Item stats and icons decoupled from code; managed via Supabase DB and Storage CDN.
+- **Interactive Shop & Inventory**: Purchase, equip, and maintain gear using persistent Gold and durability mechanics.
 
 ## 🎨 UI/UX Features
 
 - **Glassmorphism Design**: Modern, transparent UI with vibrant gradients.
 - **Advanced Navigation- **Hub Store\*\* (`core/store/hub.ts`)
-
   - Global UI state (sidebar, theme)
   - Notification queue
   - Command registry

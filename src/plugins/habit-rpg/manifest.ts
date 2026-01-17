@@ -46,6 +46,18 @@ export const manifest: PluginManifest = {
       icon: "flask-conical",
     },
     {
+      id: "rpg-shop",
+      label: "Shop",
+      path: "/rpg/shop",
+      icon: "shopping-bag",
+    },
+    {
+      id: "rpg-inventory",
+      label: "Inventory",
+      path: "/rpg/inventory",
+      icon: "backpack",
+    },
+    {
       id: "rpg-guide",
       label: "Guide",
       path: "/rpg/guide",

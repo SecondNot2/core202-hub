@@ -9,6 +9,8 @@ import { BossPage } from "./components/Boss";
 import { CharacterPage } from "./components/Character";
 import { CraftingPanel } from "./components/Crafting";
 import { GuidePage } from "./components/Guide";
+import { ShopPanel } from "./components/Shop/ShopPanel";
+import { InventoryPanel } from "./components/Inventory/InventoryPanel";
 
 export const routes: RouteObject[] = [
   {
@@ -34,5 +36,13 @@ export const routes: RouteObject[] = [
   {
     path: "guide",
     element: <GuidePage />,
+  },
+  {
+    path: "shop",
+    element: <ShopPanel />,
+  },
+  {
+    path: "inventory",
+    element: <InventoryPanel />,
   },
 ];

@@ -18,6 +18,10 @@ import type {
   GameSettings,
   StatKey,
   ArchetypeId,
+  ShopState,
+  EquipmentSlot,
+  Rarity,
+  EquipmentInstance,
 } from "../domain/types";
 import {
   xpToLevel,
@@ -40,6 +44,12 @@ import {
   checkStreakShieldEarned,
 } from "../systems/scheduler.system";
 import { dealBossDamage, updateBossHealth } from "../systems/boss.system";
+import {
+  GACHA_CONFIG,
+  getEquipmentById,
+  getEquipmentsByRarity,
+  calculateRepairCost,
+} from "../domain/items";
 
 // ============================================================================
 // Initial State Factory
@@ -75,10 +85,24 @@ const createInitialStreak = (): StreakState => ({
 });
 
 const createInitialInventory = (): Inventory => ({
-  gold: 0,
+  gold: 100, // Starting gold
   essenceShards: 0,
   relics: [],
   consumables: [],
+  items: [],
+  equipment: [],
+  loadout: {
+    tool: null,
+    environment: null,
+    accessory: null,
+  },
+});
+
+const createInitialShop = (): ShopState => ({
+  dailyRotation: [],
+  lastRotationDate: new Date().toISOString().split("T")[0],
+  purchaseHistory: [],
+  gachaPity: 0,
 });
 
 const createInitialSkillTree = (): SkillTreeState => ({
@@ -116,6 +140,7 @@ const createInitialState = (): GameState => ({
   skillTree: createInitialSkillTree(),
   boss: createInitialBoss(),
   season: createInitialSeason(),
+  shop: createInitialShop(),
   events: [],
   snapshots: [],
   settings: createInitialSettings(),
@@ -147,7 +172,7 @@ interface GameActions {
 
   // Habits
   addHabit: (
-    habit: Omit<Habit, "id" | "createdAt" | "updatedAt" | "isActive">
+    habit: Omit<Habit, "id" | "createdAt" | "updatedAt" | "isActive">,
   ) => void;
   updateHabit: (id: string, updates: Partial<Habit>) => void;
   deleteHabit: (id: string) => void;
@@ -166,6 +191,20 @@ interface GameActions {
   earnGold: (amount: number) => void;
   spendGold: (amount: number) => boolean;
   earnShards: (amount: number) => void;
+
+  // Shop & Equipment
+  buyItem: (
+    itemId: string,
+    price: number,
+    priceType: "gold" | "essence",
+  ) => boolean;
+  equipItem: (instanceId: string) => void;
+  unequipItem: (slot: EquipmentSlot) => void;
+  repairItem: (instanceId: string) => boolean;
+  useConsumable: (itemId: string) => void;
+  openMysteryBox: (
+    type: "standard" | "premium",
+  ) => { name: string; rarity: Rarity } | null;
 
   // Skills
   unlockSkill: (skillId: string) => boolean;
@@ -209,7 +248,7 @@ export const useGameStore = create<GameStore>()(
         const state = get();
         const currentDate = getGameDate(
           state.settings.timezone,
-          state.settings.dayBoundaryHour
+          state.settings.dayBoundaryHour,
         );
 
         // Run scheduler to check for resets
@@ -259,7 +298,7 @@ export const useGameStore = create<GameStore>()(
             const previousFeatures = getUnlockedFeaturesForLevel(previousLevel);
             const newFeatures = getUnlockedFeaturesForLevel(level);
             const unlockedFeatures = newFeatures.filter(
-              (f) => !previousFeatures.includes(f)
+              (f) => !previousFeatures.includes(f),
             );
 
             // Log each new feature unlock
@@ -303,7 +342,7 @@ export const useGameStore = create<GameStore>()(
             ...state.character,
             energy: Math.min(
               state.character.maxEnergy,
-              state.character.energy + amount
+              state.character.energy + amount,
             ),
           },
         })),
@@ -314,7 +353,7 @@ export const useGameStore = create<GameStore>()(
             ...state.character,
             morale: Math.max(
               0,
-              Math.min(MAX_MORALE, state.character.morale + delta)
+              Math.min(MAX_MORALE, state.character.morale + delta),
             ),
           },
         })),
@@ -342,7 +381,7 @@ export const useGameStore = create<GameStore>()(
       updateHabit: (id, updates) =>
         set((state) => ({
           habits: state.habits.map((h) =>
-            h.id === id ? { ...h, ...updates, updatedAt: Date.now() } : h
+            h.id === id ? { ...h, ...updates, updatedAt: Date.now() } : h,
           ),
         })),
 
@@ -356,7 +395,7 @@ export const useGameStore = create<GameStore>()(
           habits: state.habits.map((h) =>
             h.id === id
               ? { ...h, isActive: !h.isActive, updatedAt: Date.now() }
-              : h
+              : h,
           ),
         })),
 
@@ -365,7 +404,7 @@ export const useGameStore = create<GameStore>()(
         const state = get();
         const today = getGameDate(
           state.settings.timezone,
-          state.settings.dayBoundaryHour
+          state.settings.dayBoundaryHour,
         );
 
         // Get existing quest habit IDs for today
@@ -374,7 +413,7 @@ export const useGameStore = create<GameStore>()(
 
         // Find habits that don't have quests yet
         const habitsWithoutQuests = state.habits.filter(
-          (h) => h.isActive && !existingHabitIds.has(h.id)
+          (h) => h.isActive && !existingHabitIds.has(h.id),
         );
 
         // If no new habits need quests, return early
@@ -411,7 +450,7 @@ export const useGameStore = create<GameStore>()(
         const goldReward = calculateGoldReward(params);
         const energyCost = calculateEnergyCost(
           quest.effortMinutes,
-          state.skillTree.unlockedSkillIds
+          state.skillTree.unlockedSkillIds,
         );
 
         // Check energy
@@ -429,7 +468,7 @@ export const useGameStore = create<GameStore>()(
                   xpReward,
                   goldReward,
                 }
-              : q
+              : q,
           ),
         }));
 
@@ -443,7 +482,7 @@ export const useGameStore = create<GameStore>()(
         set((s) => {
           const today = getGameDate(
             state.settings.timezone,
-            state.settings.dayBoundaryHour
+            state.settings.dayBoundaryHour,
           );
           const isNewDayCompletion = s.streak.lastCompletedDate !== today;
           const newStreak = isNewDayCompletion
@@ -454,7 +493,7 @@ export const useGameStore = create<GameStore>()(
             ? checkStreakShieldEarned(
                 newStreak,
                 STREAK_SHIELD_INTERVAL,
-                s.streak.streakShields
+                s.streak.streakShields,
               )
             : false;
 
@@ -482,7 +521,7 @@ export const useGameStore = create<GameStore>()(
                 Object.entries(statGrowth).map(([key, val]) => [
                   key,
                   (s.character.stats[key as StatKey] || 0) + (val || 0),
-                ])
+                ]),
               ),
             },
           },
@@ -498,7 +537,7 @@ export const useGameStore = create<GameStore>()(
               ...s.boss,
               currentBoss: updateBossHealth(
                 s.boss.currentBoss!,
-                result.damageDealt
+                result.damageDealt,
               ),
               weeklyQuestsCompleted: s.boss.weeklyQuestsCompleted + 1,
               weeklyDamageDealt: s.boss.weeklyDamageDealt + result.damageDealt,
@@ -520,7 +559,7 @@ export const useGameStore = create<GameStore>()(
       skipQuest: (questId) =>
         set((state) => ({
           quests: state.quests.map((q) =>
-            q.id === questId ? { ...q, status: "skipped" as const } : q
+            q.id === questId ? { ...q, status: "skipped" as const } : q,
           ),
         })),
 
@@ -534,7 +573,7 @@ export const useGameStore = create<GameStore>()(
             graceTokens: state.streak.graceTokens - 1,
           },
           quests: state.quests.map((q) =>
-            q.id === questId ? { ...q, status: "grace" as const } : q
+            q.id === questId ? { ...q, status: "grace" as const } : q,
           ),
         });
 
@@ -577,6 +616,238 @@ export const useGameStore = create<GameStore>()(
           },
         })),
 
+      // ===== Shop & Equipment =====
+      buyItem: (itemId, price, priceType) => {
+        const state = get();
+        const currency =
+          priceType === "gold"
+            ? state.inventory.gold
+            : state.inventory.essenceShards;
+        if (currency < price) return false;
+
+        // Check if it's equipment
+        const equipDef = getEquipmentById(itemId);
+        if (equipDef) {
+          // Create new equipment instance
+          const instance: EquipmentInstance = {
+            instanceId: `eq-${Date.now()}-${Math.random()
+              .toString(36)
+              .slice(2, 7)}`,
+            definitionId: itemId,
+            currentDurability: equipDef.maxDurability,
+            obtainedAt: Date.now(),
+          };
+
+          set({
+            inventory: {
+              ...state.inventory,
+              gold:
+                priceType === "gold"
+                  ? state.inventory.gold - price
+                  : state.inventory.gold,
+              essenceShards:
+                priceType === "essence"
+                  ? state.inventory.essenceShards - price
+                  : state.inventory.essenceShards,
+              equipment: [...state.inventory.equipment, instance],
+            },
+          });
+        } else {
+          // It's a consumable/item - add to items array
+          const existingItem = state.inventory.items.find(
+            (i) => i.itemId === itemId,
+          );
+          set({
+            inventory: {
+              ...state.inventory,
+              gold:
+                priceType === "gold"
+                  ? state.inventory.gold - price
+                  : state.inventory.gold,
+              essenceShards:
+                priceType === "essence"
+                  ? state.inventory.essenceShards - price
+                  : state.inventory.essenceShards,
+              items: existingItem
+                ? state.inventory.items.map((i) =>
+                    i.itemId === itemId
+                      ? { ...i, quantity: i.quantity + 1 }
+                      : i,
+                  )
+                : [...state.inventory.items, { itemId, quantity: 1 }],
+            },
+          });
+        }
+
+        get().logEvent("item_purchased", { itemId, price, priceType });
+        return true;
+      },
+
+      equipItem: (instanceId) => {
+        const state = get();
+        const equipment = state.inventory.equipment.find(
+          (e) => e.instanceId === instanceId,
+        );
+        if (!equipment) return;
+
+        const definition = getEquipmentById(equipment.definitionId);
+        if (!definition) return;
+
+        set({
+          inventory: {
+            ...state.inventory,
+            loadout: {
+              ...state.inventory.loadout,
+              [definition.slot]: instanceId,
+            },
+          },
+        });
+      },
+
+      unequipItem: (slot) => {
+        const state = get();
+        set({
+          inventory: {
+            ...state.inventory,
+            loadout: {
+              ...state.inventory.loadout,
+              [slot]: null,
+            },
+          },
+        });
+      },
+
+      repairItem: (instanceId) => {
+        const state = get();
+        const equipment = state.inventory.equipment.find(
+          (e) => e.instanceId === instanceId,
+        );
+        if (!equipment) return false;
+
+        const definition = getEquipmentById(equipment.definitionId);
+        if (!definition) return false;
+
+        const repairCost = calculateRepairCost(
+          definition,
+          equipment.currentDurability,
+        );
+        if (state.inventory.gold < repairCost) return false;
+
+        set({
+          inventory: {
+            ...state.inventory,
+            gold: state.inventory.gold - repairCost,
+            equipment: state.inventory.equipment.map((e) =>
+              e.instanceId === instanceId
+                ? { ...e, currentDurability: definition.maxDurability }
+                : e,
+            ),
+          },
+        });
+
+        return true;
+      },
+
+      useConsumable: (itemId) => {
+        const state = get();
+        const item = state.inventory.items.find((i) => i.itemId === itemId);
+        if (!item || item.quantity <= 0) return;
+
+        // Apply effects based on item type
+        if (itemId.includes("energy")) {
+          get().restoreEnergy(25);
+        } else if (itemId.includes("morale")) {
+          get().adjustMorale(15);
+        }
+
+        // Reduce quantity
+        set({
+          inventory: {
+            ...state.inventory,
+            items: state.inventory.items
+              .map((i) =>
+                i.itemId === itemId ? { ...i, quantity: i.quantity - 1 } : i,
+              )
+              .filter((i) => i.quantity > 0),
+          },
+        });
+      },
+
+      openMysteryBox: (type) => {
+        const state = get();
+        const cost = type === "standard" ? 200 : 50;
+        const currency = type === "standard" ? "gold" : "essence";
+
+        if (type === "standard" && state.inventory.gold < cost) return null;
+        if (type === "premium" && state.inventory.essenceShards < cost)
+          return null;
+
+        // Deduct cost
+        set({
+          inventory: {
+            ...state.inventory,
+            gold:
+              currency === "gold"
+                ? state.inventory.gold - cost
+                : state.inventory.gold,
+            essenceShards:
+              currency === "essence"
+                ? state.inventory.essenceShards - cost
+                : state.inventory.essenceShards,
+          },
+        });
+
+        // Roll for rarity
+        const weights =
+          type === "standard"
+            ? GACHA_CONFIG.standardBox
+            : GACHA_CONFIG.premiumBox;
+        const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+        let roll = Math.random() * totalWeight;
+
+        let selectedRarity: Rarity = "common";
+        for (const [rarity, weight] of Object.entries(weights)) {
+          roll -= weight;
+          if (roll <= 0) {
+            selectedRarity = rarity as Rarity;
+            break;
+          }
+        }
+
+        // Get random equipment of that rarity
+        const equipmentPool = getEquipmentsByRarity(selectedRarity);
+        if (equipmentPool.length === 0) return null;
+
+        const randomEquip =
+          equipmentPool[Math.floor(Math.random() * equipmentPool.length)];
+
+        // Create instance
+        const instance: EquipmentInstance = {
+          instanceId: `eq-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 7)}`,
+          definitionId: randomEquip.id,
+          currentDurability: randomEquip.maxDurability,
+          obtainedAt: Date.now(),
+        };
+
+        set((s) => ({
+          inventory: {
+            ...s.inventory,
+            equipment: [...s.inventory.equipment, instance],
+          },
+          shop: {
+            ...s.shop,
+            gachaPity:
+              selectedRarity === "epic" || selectedRarity === "legendary"
+                ? 0
+                : s.shop.gachaPity + 1,
+          },
+        }));
+
+        return { name: randomEquip.name, rarity: selectedRarity };
+      },
+
       // ===== Skills =====
       unlockSkill: (skillId) => {
         const state = get();
@@ -604,7 +875,7 @@ export const useGameStore = create<GameStore>()(
         const state = get();
         const currentDate = getGameDate(
           state.settings.timezone,
-          state.settings.dayBoundaryHour
+          state.settings.dayBoundaryHour,
         );
         const { newState, result } = processScheduledResets(state, currentDate);
 
@@ -646,7 +917,7 @@ export const useGameStore = create<GameStore>()(
         const state = get();
         const today = getGameDate(
           state.settings.timezone,
-          state.settings.dayBoundaryHour
+          state.settings.dayBoundaryHour,
         );
 
         if (
@@ -664,7 +935,7 @@ export const useGameStore = create<GameStore>()(
         // Bonus for extra commits
         const extraCommits = Math.max(
           0,
-          commits - state.github.minCommitsForQuest
+          commits - state.github.minCommitsForQuest,
         );
         const bonusXp = extraCommits * state.github.bonusXpPerCommit;
         const bonusGold = extraCommits * 2;
@@ -705,6 +976,6 @@ export const useGameStore = create<GameStore>()(
     {
       name: "core202-habit-rpg",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

@@ -12,6 +12,7 @@ import { QuestList, HabitFormModal } from "../Quests";
 import { GitHubWidget } from "./GitHubWidget";
 import { useConfirm, useToast } from "@shared/components";
 import type { Habit } from "../../domain/types";
+import { useItemsLoader } from "../../hooks/useItemsLoader";
 
 export const Dashboard: React.FC = () => {
   const initializeGame = useGameStore((s) => s.initializeGame);
@@ -29,6 +30,9 @@ export const Dashboard: React.FC = () => {
 
   // Cloud sync hook - handles loading from and saving to Supabase
   const { removeHabit: syncRemoveHabit } = useSyncStore();
+
+  // Preload item definitions from database
+  useItemsLoader();
 
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
@@ -62,7 +66,7 @@ export const Dashboard: React.FC = () => {
   const today = new Date().toISOString().split("T")[0];
   const todayQuests = quests.filter((q) => q.date === today);
   const completedToday = todayQuests.filter(
-    (q) => q.status === "completed"
+    (q) => q.status === "completed",
   ).length;
 
   useEffect(() => {
@@ -90,7 +94,7 @@ export const Dashboard: React.FC = () => {
     toggleHabit(habit.id);
     setActiveMenuId(null);
     toast.info(
-      habit.isActive ? `"${habit.title}" paused` : `"${habit.title}" activated`
+      habit.isActive ? `"${habit.title}" paused` : `"${habit.title}" activated`,
     );
   };
 
@@ -216,7 +220,7 @@ export const Dashboard: React.FC = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             setActiveMenuId(
-                              activeMenuId === habit.id ? null : habit.id
+                              activeMenuId === habit.id ? null : habit.id,
                             );
                           }}
                           className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"

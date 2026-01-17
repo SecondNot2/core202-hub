@@ -14,6 +14,7 @@ import {
   saveGeneralStateToCloud,
   deleteHabitFromCloud,
 } from "../services/rpg-sync.service";
+import type { Inventory, ShopState } from "../domain/types";
 
 // Debounce time for auto-save (ms)
 const SAVE_DEBOUNCE_MS = 2000;
@@ -53,12 +54,39 @@ export function useSyncStore() {
 
       if (cloudData) {
         console.log("[RPG Sync] Cloud data found, merging...");
+
+        // Migrate legacy inventory to include new fields
+        const migratedInventory: Inventory = {
+          gold: cloudData.inventory?.gold || 0,
+          essenceShards: cloudData.inventory?.essenceShards || 0,
+          relics: cloudData.inventory?.relics || [],
+          consumables: cloudData.inventory?.consumables || [],
+          items: cloudData.inventory?.items || [],
+          equipment: cloudData.inventory?.equipment || [],
+          loadout: cloudData.inventory?.loadout || {
+            tool: null,
+            environment: null,
+            accessory: null,
+          },
+        };
+
+        // Migrate shop state
+        const migratedShop: ShopState = cloudData.shop || {
+          dailyRotation: [],
+          lastRotationDate: new Date().toISOString().split("T")[0],
+          purchaseHistory: [],
+          gachaPity: 0,
+        };
+
         // Merge cloud data with local (cloud takes priority for now)
         useGameStore.setState((state) => ({
           ...state,
           ...cloudData,
           // Always keep local habits if cloud is empty
           habits: cloudData.habits?.length ? cloudData.habits : state.habits,
+          // Use migrated data
+          inventory: migratedInventory,
+          shop: migratedShop,
         }));
       } else {
         console.log("[RPG Sync] No cloud data, using local state");
@@ -143,7 +171,7 @@ export function useSyncStore() {
       if (!userId) return;
       await saveHabitToCloud(userId, habit);
     },
-    [userId]
+    [userId],
   );
 
   const syncQuest = useCallback(
@@ -151,7 +179,7 @@ export function useSyncStore() {
       if (!userId) return;
       await saveQuestToCloud(userId, quest);
     },
-    [userId]
+    [userId],
   );
 
   const removeHabit = useCallback(
@@ -159,7 +187,7 @@ export function useSyncStore() {
       if (!userId) return;
       await deleteHabitFromCloud(habitId);
     },
-    [userId]
+    [userId],
   );
 
   const forceSync = useCallback(async () => {

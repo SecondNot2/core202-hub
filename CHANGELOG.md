@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## [v2.3.0] - 2026-01-17
+
+### Added
+
+- **Headless RPG Items**: Transitioned from static files to a Supabase-driven system.
+  - New `rpg_items` PostgreSQL table for dynamic stat and price balancing.
+  - New `rpg-assets` storage bucket for icon hosting and delivery.
+  - New `item.service.ts` with memory caching and static fallback protection.
+  - Automated migration tool `migrate-rpg-assets.ts` for asset/DB seeding.
+- **In-App Shop & Inventory**: Fully functional panels integrated with cloud sync.
+  - Purchase equipment and consumables with Gold.
+  - Durability, repair, and equipment management systems.
+
+### Changed
+
+- **Asset Management**: Removed 14MB of local images from the repository; now served via Supabase CDN.
+- **Data Sync**: Updated `useSyncStore` with migration logic for existing inventory data.
+
+### Fixed
+
+- **Type Safety**: Resolved multiple TypeScript errors in `ShopPanel` and `InventoryPanel`.
+- **Legacy Compatibility**: Added defensive checks for old character stats to prevent crashes during state migration.
+
 ## [v2.2.0] - 2026-01-16
 
 ### Added

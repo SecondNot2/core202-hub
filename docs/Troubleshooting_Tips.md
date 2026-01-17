@@ -81,4 +81,34 @@ When the AI attempts to replace a large component's JSX block, it sometimes mist
   export type Tables<T extends keyof DatabaseWithoutInternals['public']['Tables']> = ...
   ```
 
-_Last updated: 2026-01-16_
+---
+
+## Infrastructure: Cross-Platform ESM Path Resolution
+
+### Symptom
+
+- `Error: ENOENT: no such file or directory` when running TypeScript migration scripts.
+- Scripts work on one OS (e.g., Linux/macOS) but fail on another (e.g., Windows).
+- Absolute paths contain strange prefixes like `/D:/...` or fail to resolve relative to the script file.
+
+### Root Cause
+
+- In ES Modules (ESM), CommonJS globals like `__dirname` and `__filename` are not available.
+- Using `new URL(import.meta.url).pathname` returns a URL-encoded path string which, on Windows, often includes a leading slash (e.g., `/D:/project/file.ts`) that Node's `fs` modules cannot handle directly.
+
+### Prevention Rule
+
+- **Rule: Use `url.fileURLToPath`.** Always use the built-in `url` module to convert `import.meta.url` to a native file system path.
+- **Correct Pattern**:
+
+  ```typescript
+  import { fileURLToPath } from "url";
+  import path from "path";
+
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  ```
+
+---
+
+_Last updated: 2026-01-17_

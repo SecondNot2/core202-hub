@@ -129,7 +129,9 @@ export type ConsumableType =
   | "grace_token"
   | "energy_boost"
   | "morale_boost"
-  | "xp_boost";
+  | "xp_boost"
+  | "repair_kit"
+  | "mystery_box";
 
 export interface Consumable {
   id: string;
@@ -138,11 +140,79 @@ export interface Consumable {
   quantity: number;
 }
 
+// ============================================================================
+// Item & Equipment System
+// ============================================================================
+
+export type ItemType = "consumable" | "equipment" | "material";
+export type EquipmentSlot = "tool" | "environment" | "accessory";
+export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+
+export interface ItemDefinition {
+  id: string;
+  type: ItemType;
+  name: string;
+  description: string;
+  rarity: Rarity;
+  iconPath: string;
+  sellPrice: number;
+  maxStack?: number;
+}
+
+export interface EquipmentDefinition extends ItemDefinition {
+  type: "equipment";
+  slot: EquipmentSlot;
+  stats: Partial<Stats>;
+  affinity: StatKey | null;
+  affinityBonus: number; // e.g., 0.1 = 10%
+  maxDurability: number;
+  decayRate: number; // Chance (0-1) to lose 1 durability per quest
+}
+
+export interface EquipmentInstance {
+  instanceId: string;
+  definitionId: string;
+  currentDurability: number;
+  obtainedAt: number;
+}
+
+export interface InventoryItem {
+  itemId: string;
+  quantity: number;
+}
+
+export type Loadout = Record<EquipmentSlot, string | null>; // instanceId or null
+
 export interface Inventory {
   gold: number;
   essenceShards: number;
   relics: Relic[];
   consumables: Consumable[];
+  items: InventoryItem[];
+  equipment: EquipmentInstance[];
+  loadout: Loadout;
+}
+
+// ============================================================================
+// Shop System
+// ============================================================================
+
+export type ShopPriceType = "gold" | "essence";
+
+export interface ShopListing {
+  id: string;
+  itemId: string;
+  priceType: ShopPriceType;
+  price: number;
+  stock: "infinite" | number;
+  requiresLevel?: number;
+}
+
+export interface ShopState {
+  dailyRotation: ShopListing[];
+  lastRotationDate: string;
+  purchaseHistory: Array<{ itemId: string; purchasedAt: number }>;
+  gachaPity: number; // Counter for pity system
 }
 
 // ============================================================================
@@ -279,6 +349,7 @@ export interface GameState {
   skillTree: SkillTreeState;
   boss: BossState;
   season: SeasonState;
+  shop: ShopState;
   events: GameEvent[];
   snapshots: DailySnapshot[];
   settings: GameSettings;
