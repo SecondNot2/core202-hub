@@ -11,13 +11,15 @@ import {
   Coins,
   Diamond,
   Gift,
+  Loader2,
 } from "lucide-react";
 import { useGameStore } from "../../store";
+import { useItemsLoader } from "../../hooks/useItemsLoader";
 import {
-  EQUIPMENT_DEFINITIONS,
   RARITY_CONFIG,
   SHOP_LISTINGS,
   getItemById,
+  getEquipmentsByRarity,
 } from "../../domain/items";
 import type { Rarity } from "../../domain/types";
 
@@ -27,6 +29,9 @@ export function ShopPanel() {
   const [activeTab, setActiveTab] = useState<ShopTab>("consumables");
   const [selectedRarity, setSelectedRarity] = useState<Rarity>("common");
   const { inventory, character, buyItem } = useGameStore();
+
+  // Preload item definitions from Supabase
+  const { isLoading, error } = useItemsLoader();
 
   const tabs: { id: ShopTab; label: string; icon: React.ReactNode }[] = [
     {
@@ -63,6 +68,31 @@ export function ShopPanel() {
     if (!canAfford(price, priceType)) return;
     buyItem(itemId, price, priceType);
   };
+
+  // Show loading state while fetching items
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-amber-500 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-400">
+            Loading shop items...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if failed to load
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6 flex items-center justify-center">
+        <div className="text-center text-red-500">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6">
@@ -269,7 +299,8 @@ function EquipmentGrid({
   onBuy: (itemId: string, price: number, priceType: "gold" | "essence") => void;
   canAfford: (price: number, priceType: "gold" | "essence") => boolean;
 }) {
-  const equipment = EQUIPMENT_DEFINITIONS.filter((eq) => eq.rarity === rarity);
+  // Use getEquipmentsByRarity to get equipment with Supabase icon URLs
+  const equipment = getEquipmentsByRarity(rarity);
   const basePrice = SHOP_LISTINGS.equipment[rarity].basePrice;
   const config = RARITY_CONFIG[rarity];
 
@@ -369,6 +400,15 @@ function GachaSection({ gold, essence }: { gold: number; essence: number }) {
   );
   const { openMysteryBox } = useGameStore();
 
+  // Get mystery box icons from item definitions
+  const standardBoxItem = getItemById("item_mystery_box");
+  const premiumBoxItem = getItemById("item_mystery_box_premium");
+  const standardBoxIcon =
+    standardBoxItem?.iconPath || "/assets/rpg/items/consumable_mystery_box.png";
+  const premiumBoxIcon =
+    premiumBoxItem?.iconPath ||
+    "/assets/rpg/items/consumable_mystery_box_premium.png";
+
   const handleOpen = async (type: "standard" | "premium") => {
     const cost = type === "standard" ? 200 : 50;
     const currency = type === "standard" ? "gold" : "essence";
@@ -405,7 +445,7 @@ function GachaSection({ gold, essence }: { gold: number; essence: number }) {
         {/* Standard Box */}
         <div className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-6 w-72 border-2 border-slate-300 dark:border-slate-600">
           <img
-            src="/assets/rpg/items/consumable_mystery_box.png"
+            src={standardBoxIcon}
             alt="Mystery Box"
             className="w-32 h-32 mx-auto mb-4 drop-shadow-lg"
           />
@@ -433,7 +473,7 @@ function GachaSection({ gold, essence }: { gold: number; essence: number }) {
         <div className="bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 rounded-2xl p-6 w-72 border-2 border-purple-400 dark:border-purple-600">
           <div className="relative">
             <img
-              src="/assets/rpg/items/consumable_mystery_box.png"
+              src={premiumBoxIcon}
               alt="Premium Mystery Box"
               className="w-32 h-32 mx-auto mb-4 drop-shadow-lg"
               style={{ filter: "hue-rotate(45deg) saturate(1.5)" }}

@@ -15,8 +15,10 @@ import {
   Check,
   X,
   Coins,
+  Loader2,
 } from "lucide-react";
 import { useGameStore } from "../../store";
+import { useItemsLoader } from "../../hooks/useItemsLoader";
 import {
   RARITY_CONFIG,
   getEquipmentById,
@@ -35,6 +37,34 @@ export function InventoryPanel() {
   const [activeTab, setActiveTab] = useState<InventoryTab>("equipment");
   const { inventory, equipItem, unequipItem, repairItem, useConsumable } =
     useGameStore();
+
+  // Preload item definitions from Supabase
+  const { isLoading, error } = useItemsLoader();
+
+  // Show loading state while fetching items
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-emerald-500 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-400">
+            Loading inventory...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if failed to load
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-6 flex items-center justify-center">
+        <div className="text-center text-red-500">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   const tabs: { id: InventoryTab; label: string; icon: ReactNode }[] = [
     {
