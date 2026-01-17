@@ -11,7 +11,7 @@ import type { GameState, Habit, QuestInstance } from "../domain/types";
 // ============================================================================
 
 export async function loadFromCloud(
-  userId: string
+  userId: string,
 ): Promise<Partial<GameState> | null> {
   try {
     // Load character
@@ -135,6 +135,7 @@ export async function loadFromCloud(
       if (gs.boss_state) result.boss = gs.boss_state;
       if (gs.season_state) result.season = gs.season_state;
       if (gs.game_settings) result.settings = gs.game_settings;
+      if (gs.shop) result.shop = gs.shop;
     }
 
     return result;
@@ -150,7 +151,7 @@ export async function loadFromCloud(
 
 export async function saveCharacterToCloud(
   userId: string,
-  character: GameState["character"]
+  character: GameState["character"],
 ): Promise<boolean> {
   try {
     const { error } = await supabase.from("rpg_characters").upsert({
@@ -177,7 +178,7 @@ export async function saveCharacterToCloud(
 
 export async function saveHabitToCloud(
   userId: string,
-  habit: Habit
+  habit: Habit,
 ): Promise<boolean> {
   try {
     const { error } = await supabase.from("rpg_habits").upsert({
@@ -219,7 +220,7 @@ export async function deleteHabitFromCloud(habitId: string): Promise<boolean> {
 
 export async function saveQuestToCloud(
   userId: string,
-  quest: QuestInstance
+  quest: QuestInstance,
 ): Promise<boolean> {
   try {
     const { error } = await supabase.from("rpg_quests").upsert({
@@ -251,8 +252,14 @@ export async function saveGeneralStateToCloud(
   userId: string,
   state: Pick<
     GameState,
-    "inventory" | "streak" | "skillTree" | "boss" | "season" | "settings"
-  >
+    | "inventory"
+    | "streak"
+    | "skillTree"
+    | "boss"
+    | "season"
+    | "settings"
+    | "shop"
+  >,
 ): Promise<boolean> {
   try {
     const { error } = await supabase.from("rpg_general_state").upsert({
@@ -269,6 +276,8 @@ export async function saveGeneralStateToCloud(
       season_state: state.season as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       game_settings: state.settings as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      shop: state.shop as any,
     });
 
     if (error) throw error;
@@ -286,7 +295,7 @@ export async function saveGeneralStateToCloud(
 export async function logEventToCloud(
   userId: string,
   type: string,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): Promise<void> {
   try {
     await supabase.from("rpg_events").insert({

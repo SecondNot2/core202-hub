@@ -25,7 +25,7 @@ export const QuestList: React.FC = () => {
   const pendingQuests = todayQuests.filter((q) => q.status === "pending");
   const completedQuests = todayQuests.filter((q) => q.status === "completed");
   const otherQuests = todayQuests.filter(
-    (q) => q.status === "skipped" || q.status === "grace"
+    (q) => q.status === "skipped" || q.status === "grace",
   );
 
   const completionPercent =
@@ -142,7 +142,7 @@ export const QuestList: React.FC = () => {
 
             {/* Completed */}
             {completedQuests.length > 0 && (
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-700/50">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-700/50 space-y-3">
                 <p className="text-sm text-slate-500 mb-2">Completed</p>
                 {completedQuests.map((quest) => (
                   <QuestCard
@@ -158,7 +158,7 @@ export const QuestList: React.FC = () => {
 
             {/* Skipped/Grace */}
             {otherQuests.length > 0 && (
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-700/50">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-700/50 space-y-3">
                 <p className="text-sm text-slate-500 mb-2">Skipped / Grace</p>
                 {otherQuests.map((quest) => (
                   <QuestCard

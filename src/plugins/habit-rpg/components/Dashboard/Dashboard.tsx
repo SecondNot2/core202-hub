@@ -12,7 +12,7 @@ import { QuestList, HabitFormModal } from "../Quests";
 import { GitHubWidget } from "./GitHubWidget";
 import { useConfirm, useToast } from "@shared/components";
 import type { Habit } from "../../domain/types";
-import { useItemsLoader } from "../../hooks/useItemsLoader";
+import { Loader2 } from "lucide-react";
 
 export const Dashboard: React.FC = () => {
   const initializeGame = useGameStore((s) => s.initializeGame);
@@ -29,10 +29,7 @@ export const Dashboard: React.FC = () => {
   const { toast } = useToast();
 
   // Cloud sync hook - handles loading from and saving to Supabase
-  const { removeHabit: syncRemoveHabit } = useSyncStore();
-
-  // Preload item definitions from database
-  useItemsLoader();
+  const { removeHabit: syncRemoveHabit, isSaving } = useSyncStore();
 
   const [showHabitForm, setShowHabitForm] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
@@ -112,12 +109,21 @@ export const Dashboard: React.FC = () => {
             </p>
           </div>
 
-          <button
-            onClick={handleAddHabit}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium transition-all hover:scale-105 shadow-lg shadow-purple-500/25 flex items-center gap-2"
-          >
-            <span className="text-lg">+</span> Add Habit
-          </button>
+          <div className="flex items-center gap-3">
+            {isSaving && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur rounded-full text-xs font-medium text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-sm animate-pulse">
+                <Loader2 size={12} className="animate-spin" />
+                Saving...
+              </div>
+            )}
+
+            <button
+              onClick={handleAddHabit}
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium transition-all hover:scale-105 shadow-lg shadow-purple-500/25 flex items-center gap-2"
+            >
+              <span className="text-lg">+</span> Add Habit
+            </button>
+          </div>
         </div>
 
         {/* Quick Stats Bar */}

@@ -7,49 +7,72 @@ import { Link } from "react-router-dom";
 import { useGameStore } from "../../store";
 import { CRAFTING_RECIPES } from "../../domain/constants";
 import { RecipeCard } from "./RecipeCard";
+import { useConfirm, useToast } from "@shared/components";
 
 export const CraftingPanel: React.FC = () => {
   const gold = useGameStore((s) => s.inventory.gold);
   const playerLevel = useGameStore((s) => s.character.level);
-  const spendGold = useGameStore((s) => s.spendGold);
   const restoreEnergy = useGameStore((s) => s.restoreEnergy);
   const adjustMorale = useGameStore((s) => s.adjustMorale);
+  const spendGold = useGameStore((s) => s.spendGold);
+  const { confirm } = useConfirm();
+  const { toast } = useToast();
 
   // Crafting is unlocked at Level 10
   const isUnlocked = playerLevel >= 10;
 
-  const handleCraft = (recipeId: string) => {
+  const handleCraft = async (recipeId: string) => {
     const recipe = CRAFTING_RECIPES.find((r) => r.id === recipeId);
     if (!recipe) return;
 
     // Check gold
-    if (!spendGold(recipe.goldCost)) {
+    if (gold < recipe.goldCost) {
+      toast.error(
+        `Insufficient Gold: You need ${recipe.goldCost} gold to craft this item.`,
+      );
       return;
     }
 
-    // Apply effect
-    switch (recipeId) {
-      case "grace-token":
-        useGameStore.setState((state) => ({
-          streak: {
-            ...state.streak,
-            graceTokens: Math.min(
-              state.streak.graceTokens + 1,
-              state.streak.maxGraceTokens + 1
-            ),
-          },
-        }));
-        break;
-      case "energy-potion":
-        restoreEnergy(25);
-        break;
-      case "morale-boost":
-        adjustMorale(15);
-        break;
-    }
+    const confirmed = await confirm({
+      title: "Craft Item",
+      message: `Spend ${recipe.goldCost} Gold to craft ${recipe.name}?`,
+      confirmText: "Craft",
+      cancelText: "Cancel",
+    });
 
-    // Log event
-    useGameStore.getState().logEvent("item_crafted", { recipeId });
+    if (confirmed) {
+      if (!spendGold(recipe.goldCost)) return; // Double check
+
+      // Apply effect
+      switch (recipeId) {
+        case "grace-token":
+          useGameStore.setState((state) => ({
+            streak: {
+              ...state.streak,
+              graceTokens: Math.min(
+                state.streak.graceTokens + 1,
+                state.streak.maxGraceTokens + 1,
+              ),
+            },
+          }));
+          break;
+        case "energy-potion":
+          restoreEnergy(25);
+          break;
+        case "morale-boost":
+          adjustMorale(15);
+          break;
+      }
+
+      // Log event
+      useGameStore.getState().logEvent("item_crafted", { recipeId });
+
+      const newBalance = useGameStore.getState().inventory.gold;
+
+      toast.success(
+        `Crafting Successful: Crafted ${recipe.name} (-${recipe.goldCost} Gold). Remaining: ${newBalance} Gold.`,
+      );
+    }
   };
 
   return (

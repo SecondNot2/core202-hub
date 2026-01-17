@@ -12,14 +12,18 @@
 - **In-App Shop & Inventory**: Fully functional panels integrated with cloud sync.
   - Purchase equipment and consumables with Gold.
   - Durability, repair, and equipment management systems.
+- **Premium UX Flow**: Integrated `useConfirm` and `useToast` for all critical game actions (Shop, Gacha, Skill Tree, Crafting).
+- **Centralized RPG Layout**: New `RPGLayout` component to manage global RPG initialization (sync/cache) in a single place.
 
 ### Changed
 
 - **Asset Management**: Removed 14MB of local images from the repository; now served via Supabase CDN.
-- **Data Sync**: Updated `useSyncStore` with migration logic for existing inventory data.
+- **Data Sync**: Updated `useSyncStore` with migration logic for existing inventory data and refactored to use module-level state, preventing redundant cloud hydration during page navigation.
 
 ### Fixed
 
+- **Persistence**: Purchase history for items and mystery boxes now correctly records and persists to the database.
+- **Bug Fixes**: Resolved compilation errors in `ShopPanel`, `SkillTreeView`, and `CraftingPanel` related to toast API and property naming.
 - **Type Safety**: Resolved multiple TypeScript errors in `ShopPanel` and `InventoryPanel`.
 - **Legacy Compatibility**: Added defensive checks for old character stats to prevent crashes during state migration.
 

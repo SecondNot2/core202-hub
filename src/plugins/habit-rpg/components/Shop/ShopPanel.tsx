@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useGameStore } from "../../store";
 import { useItemsLoader } from "../../hooks/useItemsLoader";
+import { useConfirm, useToast } from "@shared/components";
 import {
   RARITY_CONFIG,
   SHOP_LISTINGS,
@@ -29,6 +30,8 @@ export function ShopPanel() {
   const [activeTab, setActiveTab] = useState<ShopTab>("consumables");
   const [selectedRarity, setSelectedRarity] = useState<Rarity>("common");
   const { inventory, character, buyItem } = useGameStore();
+  const { confirm } = useConfirm();
+  const { toast } = useToast();
 
   // Preload item definitions from Supabase
   const { isLoading, error } = useItemsLoader();
@@ -60,13 +63,44 @@ export function ShopPanel() {
     return inventory.essenceShards >= price;
   };
 
-  const handleBuy = (
+  const handleBuy = async (
     itemId: string,
     price: number,
     priceType: "gold" | "essence",
   ) => {
-    if (!canAfford(price, priceType)) return;
-    buyItem(itemId, price, priceType);
+    if (!canAfford(price, priceType)) {
+      toast.error(
+        `Insufficient Funds: You need ${price} ${priceType} to buy this item.`,
+      );
+      return;
+    }
+
+    const item =
+      getItemById(itemId) ||
+      getEquipmentsByRarity(selectedRarity).find((e) => e.id === itemId);
+    const itemName = item?.name || "Item";
+
+    const confirmed = await confirm({
+      title: "Confirm Purchase",
+      message: `Are you sure you want to buy ${itemName} for ${price} ${priceType}?`,
+      confirmText: "Buy Now",
+      cancelText: "Cancel",
+    });
+
+    if (confirmed) {
+      buyItem(itemId, price, priceType);
+
+      // Get updated balance
+      const newBalance =
+        useGameStore.getState().inventory[
+          priceType === "gold" ? "gold" : "essenceShards"
+        ];
+      const currencyName = priceType === "gold" ? "Gold" : "Essence";
+
+      toast.success(
+        `Bought ${itemName} for ${price} ${currencyName}. Remaining: ${newBalance} ${currencyName}.`,
+      );
+    }
   };
 
   // Show loading state while fetching items
@@ -399,6 +433,8 @@ function GachaSection({ gold, essence }: { gold: number; essence: number }) {
     null,
   );
   const { openMysteryBox } = useGameStore();
+  const { confirm } = useConfirm();
+  const { toast } = useToast();
 
   // Get mystery box icons from item definitions
   const standardBoxItem = getItemById("item_mystery_box");
@@ -417,8 +453,20 @@ function GachaSection({ gold, essence }: { gold: number; essence: number }) {
       (currency === "gold" && gold < cost) ||
       (currency === "essence" && essence < cost)
     ) {
+      toast.error(
+        `Insufficient Funds: You do not have enough ${currency} to open this box.`,
+      );
       return;
     }
+
+    const confirmed = await confirm({
+      title: "Open Mystery Box",
+      message: `Spend ${cost} ${currency} to open a ${type} mystery box?`,
+      confirmText: "Open It!",
+      cancelText: "Cancel",
+    });
+
+    if (!confirmed) return;
 
     setIsOpening(true);
     // Simulate animation delay
@@ -427,6 +475,17 @@ function GachaSection({ gold, essence }: { gold: number; essence: number }) {
     const resultItem = openMysteryBox(type);
     if (resultItem) {
       setResult(resultItem);
+
+      // Get updated balance
+      const newBalance =
+        useGameStore.getState().inventory[
+          currency === "gold" ? "gold" : "essenceShards"
+        ];
+      const currencyName = currency === "gold" ? "Gold" : "Essence";
+
+      toast.success(
+        `Found ${resultItem.name} (${type})! -${cost} ${currencyName}. Remaining: ${newBalance}.`,
+      );
     }
     setIsOpening(false);
   };

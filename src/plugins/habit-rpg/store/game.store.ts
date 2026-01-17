@@ -651,6 +651,18 @@ export const useGameStore = create<GameStore>()(
                   : state.inventory.essenceShards,
               equipment: [...state.inventory.equipment, instance],
             },
+            shop: {
+              ...state.shop,
+              purchaseHistory: [
+                ...state.shop.purchaseHistory,
+                {
+                  itemId,
+                  date: new Date().toISOString(),
+                  price,
+                  currency: priceType,
+                },
+              ],
+            },
           });
         } else {
           // It's a consumable/item - add to items array
@@ -675,6 +687,18 @@ export const useGameStore = create<GameStore>()(
                       : i,
                   )
                 : [...state.inventory.items, { itemId, quantity: 1 }],
+            },
+            shop: {
+              ...state.shop,
+              purchaseHistory: [
+                ...state.shop.purchaseHistory,
+                {
+                  itemId,
+                  date: new Date().toISOString(),
+                  price,
+                  currency: priceType,
+                },
+              ],
             },
           });
         }
@@ -842,6 +866,15 @@ export const useGameStore = create<GameStore>()(
               selectedRarity === "epic" || selectedRarity === "legendary"
                 ? 0
                 : s.shop.gachaPity + 1,
+            purchaseHistory: [
+              ...s.shop.purchaseHistory,
+              {
+                itemId: `gacha_${type}_${Date.now()}`,
+                date: new Date().toISOString(),
+                price: cost,
+                currency: currency,
+              },
+            ],
           },
         }));
 

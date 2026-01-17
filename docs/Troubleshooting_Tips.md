@@ -109,6 +109,40 @@ When the AI attempts to replace a large component's JSX block, it sometimes mist
   const __dirname = path.dirname(__filename);
   ```
 
+  ```
+
+  ```
+
+---
+
+## Shared Components: Toast API Consistency
+
+### Symptom
+
+- `This expression is not callable ... has no call signatures.` when calling `toast({...})`.
+
+### Root Cause
+
+- The Hub's `useToast` hook returns an object with methods (`success`, `error`, `info`, `warning`) rather than a single callable function (shadcn/ui style).
+
+### Prevention Rule
+
+- **Rule: Method-Based Toasts.** Always use `toast.success("message")` or `toast.error("message")`. Do not pass a configuration object directly to the `toast` instance.
+
+## State Management: Navigation Hydration Flash
+
+### Symptom
+
+- Latest local changes (e.g., buying an item) appear to "rollback" or reset after navigating to another page and back.
+
+### Root Cause
+
+- `useSyncStore` triggering a cloud fetch on every mount. If the fetch completes before the previous page's auto-save, the old cloud data overwrites the fresh local data.
+
+### Prevention Rule
+
+- **Rule: Session-Aware Hydration.** Use a module-scoped flag (outside the hook/component) to track if cloud hydration has already occurred in the current session. Reset this flag only on user Logout/Login.
+
 ---
 
 _Last updated: 2026-01-17_

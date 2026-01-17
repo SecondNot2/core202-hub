@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useGameStore } from "../../store";
 import { useItemsLoader } from "../../hooks/useItemsLoader";
+import { useConfirm, useToast } from "@shared/components";
 import {
   RARITY_CONFIG,
   getEquipmentById,
@@ -37,6 +38,8 @@ export function InventoryPanel() {
   const [activeTab, setActiveTab] = useState<InventoryTab>("equipment");
   const { inventory, equipItem, unequipItem, repairItem, useConsumable } =
     useGameStore();
+  const { confirm } = useConfirm();
+  const { toast } = useToast();
 
   // Preload item definitions from Supabase
   const { isLoading, error } = useItemsLoader();
@@ -168,7 +171,14 @@ export function InventoryPanel() {
                           />
                         </div>
                         <button
-                          onClick={() => unequipItem(slot)}
+                          onClick={() => {
+                            unequipItem(slot);
+                            toast({
+                              title: "Unequipped",
+                              description: `You unequipped ${definition.name}.`,
+                              variant: "info",
+                            });
+                          }}
                           className="p-2 text-slate-400 hover:text-red-500 transition-colors"
                           title="Unequip"
                         >
@@ -218,15 +228,52 @@ export function InventoryPanel() {
                 }
               }
               gold={inventory.gold || 0}
-              onEquip={equipItem}
-              onRepair={repairItem}
+              onEquip={(id) => {
+                equipItem(id);
+                toast({
+                  title: "Equipped",
+                  description: "Item equipped successfully.",
+                  variant: "success",
+                });
+              }}
+              onRepair={async (id) => {
+                // Repair logic could also go here if needed, but keeping it simple for now
+                repairItem(id);
+                toast({
+                  title: "Repaired",
+                  description: "Item repaired successfully.",
+                  variant: "success",
+                });
+              }}
             />
           )}
           {activeTab === "consumables" && (
             <ConsumablesList
               items={inventory.items || []}
               consumables={inventory.consumables || []}
-              onUse={useConsumable}
+              onUse={async (itemId) => {
+                const item =
+                  inventory.items.find((i) => i.itemId === itemId) ||
+                  inventory.consumables.find((c) => c.id === itemId);
+                const def = getItemById(itemId) || (item as any)?.definition;
+                const name = def?.name || "Item";
+
+                const confirmed = await confirm({
+                  title: "Use Item",
+                  message: `Are you sure you want to use ${name}? This action cannot be undone.`,
+                  confirmText: "Use It",
+                  cancelText: "Cancel",
+                });
+
+                if (confirmed) {
+                  useConsumable(itemId);
+                  toast({
+                    title: "Item Used",
+                    description: `You used ${name}.`,
+                    variant: "success",
+                  });
+                }
+              }}
             />
           )}
         </div>

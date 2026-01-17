@@ -3,7 +3,7 @@
  * Integrates cloud sync with the game store
  */
 
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import { useAuth } from "@core/auth/AuthContext";
 import { useGameStore } from "./game.store";
 import {
@@ -17,7 +17,10 @@ import {
 import type { Inventory, ShopState } from "../domain/types";
 
 // Debounce time for auto-save (ms)
-const SAVE_DEBOUNCE_MS = 2000;
+const SAVE_DEBOUNCE_MS = 1000;
+
+// Track if initial load has happened - MUST be module-scoped to persist across navigations
+let hasLoadedFromCloud = false;
 
 /**
  * Hook to handle cloud synchronization for RPG data
@@ -27,9 +30,22 @@ export function useSyncStore() {
   const { user } = useAuth();
   const userId = user?.id;
 
-  // Track if initial load has happened
-  const hasLoaded = useRef(false);
+  // Track if initial load has happened (local ref for compatibility)
+  const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevUserIdRef = useRef<string | undefined>(undefined);
+
+  // Reset load flag when user changes (logout/login)
+  useEffect(() => {
+    if (
+      prevUserIdRef.current !== undefined &&
+      prevUserIdRef.current !== userId
+    ) {
+      // User changed, reset the flag so we reload from cloud
+      hasLoadedFromCloud = false;
+    }
+    prevUserIdRef.current = userId;
+  }, [userId]);
 
   // Get store state and actions
   const character = useGameStore((s) => s.character);
@@ -41,12 +57,13 @@ export function useSyncStore() {
   const boss = useGameStore((s) => s.boss);
   const season = useGameStore((s) => s.season);
   const settings = useGameStore((s) => s.settings);
+  const shop = useGameStore((s) => s.shop);
 
   // ============================================================================
   // Load from Cloud on Login
   // ============================================================================
   useEffect(() => {
-    if (!userId || hasLoaded.current) return;
+    if (!userId || hasLoadedFromCloud) return;
 
     const loadData = async () => {
       console.log("[RPG Sync] Loading from cloud...");
@@ -92,7 +109,7 @@ export function useSyncStore() {
         console.log("[RPG Sync] No cloud data, using local state");
       }
 
-      hasLoaded.current = true;
+      hasLoadedFromCloud = true;
     };
 
     loadData();
@@ -108,7 +125,7 @@ export function useSyncStore() {
 
   // Debounced save on character change
   useEffect(() => {
-    if (!userId || !hasLoaded.current) return;
+    if (!userId || !hasLoadedFromCloud) return;
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -136,6 +153,7 @@ export function useSyncStore() {
   // ============================================================================
   const saveGeneralState = useCallback(async () => {
     if (!userId) return;
+    setIsSaving(true);
     await saveGeneralStateToCloud(userId, {
       inventory,
       streak,
@@ -143,12 +161,14 @@ export function useSyncStore() {
       boss,
       season,
       settings,
+      shop,
     });
-  }, [userId, inventory, streak, skillTree, boss, season, settings]);
+    setIsSaving(false);
+  }, [userId, inventory, streak, skillTree, boss, season, settings, shop]);
 
   // Auto-save general state when key values change
   useEffect(() => {
-    if (!userId || !hasLoaded.current) return;
+    if (!userId || !hasLoadedFromCloud) return;
 
     const timeout = setTimeout(() => {
       saveGeneralState();
@@ -158,9 +178,18 @@ export function useSyncStore() {
   }, [
     userId,
     saveGeneralState,
+    // Deep watch inventory triggers
     inventory.gold,
+    inventory.essenceShards,
+    inventory.items,
+    inventory.equipment,
+    inventory.loadout,
+    // Other state triggers
     streak.currentStreak,
     skillTree.unlockedSkillIds.length,
+    boss.weeklyDamageDealt,
+    shop.purchaseHistory.length, // Trigger on purchase
+    shop.gachaPity,
   ]);
 
   // ============================================================================
@@ -199,7 +228,8 @@ export function useSyncStore() {
 
   return {
     isLoggedIn: !!userId,
-    hasLoaded: hasLoaded.current,
+    hasLoaded: hasLoadedFromCloud,
+    isSaving,
     syncHabit,
     syncQuest,
     removeHabit,
